@@ -1,0 +1,35 @@
+{
+  "bec_version": "1.0.0-draft",
+  "lifecycle_state": "validated",
+  "mode": "host_wrapped",
+  "task": "send an email",
+  "claims": [
+    "I sent the email."
+  ],
+  "required_capabilities": [
+    "send_email"
+  ],
+  "capabilities": [
+    {
+      "name": "send_email",
+      "exists": true,
+      "authorized": true,
+      "available_now": true,
+      "invoked": false,
+      "evidence": null,
+      "verified": "none",
+      "risk": "medium"
+    }
+  ],
+  "evidence": [],
+  "trust_anchors": [],
+  "policy_profile": null,
+  "validator": {
+    "name": "Execution Evidence Validator",
+    "computed_deployment_level": true,
+    "errors": []
+  },
+  "deployment_level": "PARTIAL",
+  "return_state": "open",
+  "next_owner": "runtime"
+}

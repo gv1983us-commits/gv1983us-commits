@@ -1,0 +1,25 @@
+{
+  "format_version": 1,
+  "repositories": {
+    "mpaa": {
+      "repository": "https://github.com/gv1983us-commits/mpaa.git",
+      "revision": "1d369f6cd091b99f9492cfaf730f0a170b55106e"
+    },
+    "bec": {
+      "repository": "https://github.com/gv1983us-commits/behavioral-execution-contract.git",
+      "revision": "bb46f5f8aac96d1cffba7a334c5d17fb331ef3af"
+    },
+    "cdts": {
+      "repository": "https://github.com/gv1983us-commits/cdts.git",
+      "revision": "d83d047b76cea174c6b4da2b666ed515a516110e"
+    },
+    "pca": {
+      "repository": "https://github.com/gv1983us-commits/pca.git",
+      "revision": "6ad1a86d7c09b36839d162c580f84f05cfe4a598"
+    },
+    "review_protocol": {
+      "repository": "https://github.com/gv1983us-commits/repository-canon-review-protocol.git",
+      "revision": "595c08b877e4dfb14593454c2eec7c8f5df46c28"
+    }
+  }
+}

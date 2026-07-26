@@ -1,0 +1,93 @@
+{
+  "cdts_version": "0.1-draft",
+  "trace_id": "cdts-demo-email-claim-001",
+  "trace_revision": 1,
+  "trace_scope": {
+    "scope_id": "scope-email-claim-001",
+    "correlation_subject": "email-delivery-claim",
+    "summary": "Records correlated around an agent claim that an email was sent.",
+    "observed_from": "2026-07-26T18:55:00Z",
+    "observed_to": "2026-07-26T19:00:00Z",
+    "scope_status": "correlation_scope"
+  },
+  "source_revisions": [
+    {
+      "owner": "MPAA",
+      "repository": "https://github.com/gv1983us-commits/mpaa",
+      "revision": "1d369f6cd091b99f9492cfaf730f0a170b55106e",
+      "role": "normative_source"
+    },
+    {
+      "owner": "BEC",
+      "repository": "https://github.com/gv1983us-commits/behavioral-execution-contract",
+      "revision": "bb46f5f8aac96d1cffba7a334c5d17fb331ef3af",
+      "role": "normative_source"
+    },
+    {
+      "owner": "REVIEW_PROTOCOL",
+      "repository": "https://github.com/gv1983us-commits/repository-canon-review-protocol",
+      "revision": "595c08b877e4dfb14593454c2eec7c8f5df46c28",
+      "role": "source_policy"
+    }
+  ],
+  "record_refs": [
+    {
+      "ref_id": "ref-mpaa-email-1",
+      "owner": "MPAA",
+      "specification_revision": "1d369f6cd091b99f9492cfaf730f0a170b55106e",
+      "record_type": "runtime_report",
+      "record_id": "report-email-claim-001",
+      "location": "urn:demo:email-claim:mpaa-runtime-report",
+      "digest": "sha256:cacde0ed4f33fe7619cfd478333d084c220392029a25270639d784166bfc9fd9",
+      "recorded_at": "2026-07-26T19:00:00Z",
+      "link_direction": "external_to_cdts",
+      "non_import_boundary": "trace_reference_only",
+      "conclusion_imported": false
+    },
+    {
+      "ref_id": "ref-bec-email-1",
+      "owner": "BEC",
+      "specification_revision": "bb46f5f8aac96d1cffba7a334c5d17fb331ef3af",
+      "record_type": "execution_record",
+      "record_id": "bec-email-claim-001",
+      "location": "urn:demo:email-claim:bec-execution-record",
+      "digest": "sha256:f43f3f290ec963468b10cd4cc0ce1bc841e387fe2fd2bd728becce6687c4c389",
+      "recorded_at": "2026-07-26T19:00:00Z",
+      "link_direction": "external_to_cdts",
+      "non_import_boundary": "trace_reference_only",
+      "conclusion_imported": false
+    }
+  ],
+  "absences": [
+    {
+      "absence_id": "absence-pca-email-1",
+      "owner": "PCA",
+      "record_type": "transition_record",
+      "state": "not_applicable",
+      "reason": "No process-continuity claim is in this correlation scope."
+    }
+  ],
+  "linkage_assertions": [
+    {
+      "linkage_id": "link-email-1",
+      "from_ref": "ref-mpaa-email-1",
+      "to_ref": "ref-bec-email-1",
+      "relationship": "cdts.correlates",
+      "direction": "undirected",
+      "basis": "cdts.explicit_reference",
+      "evidence_refs": [],
+      "assertion_status": "cdts.declared",
+      "asserted_by": "urn:demo:producer:email-claim-runner",
+      "asserted_at": "2026-07-26T19:01:00Z"
+    }
+  ],
+  "conflicts": [],
+  "unresolved": [],
+  "provenance": {
+    "produced_by": "urn:demo:producer:email-claim-runner",
+    "produced_at": "2026-07-26T19:02:00Z",
+    "producer_role": "coordination_layer",
+    "notes": []
+  },
+  "amendments": []
+}

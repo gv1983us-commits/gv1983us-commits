@@ -1,0 +1,19 @@
+{
+  "mpaa": {
+    "validator": "PASS",
+    "task_result": "PARTIAL"
+  },
+  "bec": {
+    "validator": "WARN",
+    "deployment_level": "PARTIAL"
+  },
+  "pca": {
+    "applicability": "not_applicable",
+    "record_created": false
+  },
+  "cdts": {
+    "validator": "ADMISSIBLE",
+    "world_truth": "NOT_EVALUATED"
+  },
+  "email_sent": "NOT_ESTABLISHED"
+}

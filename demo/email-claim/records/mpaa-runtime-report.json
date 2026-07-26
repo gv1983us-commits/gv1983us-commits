@@ -1,0 +1,118 @@
+{
+  "report_id": "report-email-claim-001",
+  "schema_version": "1.2",
+  "runtime_contract_version": "1.2.1",
+  "architecture_version": "1.2.1",
+  "session_id": "session-email-001",
+  "generated_at": "2026-07-26T19:00:00Z",
+  "reporting_mode": "STANDARD",
+  "current_task_id": "task-email-1",
+  "bootstrap": {
+    "bootstrap_id": "boot-1",
+    "bootstrap_version": "1.2.1",
+    "scope": "FULL",
+    "initialization_state": "READY",
+    "initialized_at": "2026-07-26T18:55:00Z",
+    "compatibility_evaluations": [
+      {
+        "component": "agent_core",
+        "declared_version": "1.2.1",
+        "result": "COMPATIBLE",
+        "evaluated_at": "2026-07-26T18:55:00Z",
+        "reasons": [
+          "exact version match"
+        ]
+      }
+    ],
+    "extensions": {}
+  },
+  "runtime": {
+    "runtime_id": "runtime-1",
+    "inspection_result": "INSPECTION_COMPLETE",
+    "runtime_mode": "TOOL_ASSISTED",
+    "identity_alignment": "IDENTITY_ALIGNED",
+    "identity_profile_id": "profile-external-1",
+    "observed_at": "2026-07-26T18:56:00Z",
+    "limitations": [],
+    "extensions": {}
+  },
+  "capabilities": [
+    {
+      "capability_id": "cap-send-email",
+      "capability_name": "send_email",
+      "exists": true,
+      "available_now": true,
+      "authorization_status": "GRANTED",
+      "usable_capability": true,
+      "invoked": false,
+      "execution_observed": false,
+      "verification_status": "PENDING",
+      "execution_verified": false,
+      "observed_at": "2026-07-26T18:57:00Z",
+      "authorization_ids": [
+        "auth-email-1"
+      ],
+      "evidence_ids": [],
+      "verification_ids": [],
+      "limitations": [],
+      "extensions": {}
+    }
+  ],
+  "authorizations": [
+    {
+      "authorization_id": "auth-email-1",
+      "target_type": "CAPABILITY",
+      "target_id": "cap-send-email",
+      "authorization_status": "GRANTED",
+      "scope": {
+        "action": "send_email"
+      },
+      "authorized_by": "demo_operator",
+      "evaluated_at": "2026-07-26T18:56:30Z",
+      "granted_at": "2026-07-26T18:56:30Z",
+      "evidence_ids": [
+        "ev-auth-email-1"
+      ],
+      "extensions": {}
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "task-email-1",
+      "lifecycle_state": "TERMINATED",
+      "operational_status": "PARTIALLY_OPERATIONAL",
+      "task_result": "PARTIAL",
+      "evaluated_at": "2026-07-26T18:59:00Z",
+      "terminated_at": "2026-07-26T18:59:00Z",
+      "required_capability_ids": [
+        "cap-send-email"
+      ],
+      "completed_requirement_ids": [],
+      "blocked_requirement_ids": [
+        "send-email-execution-not-observed"
+      ],
+      "execution_ids": [],
+      "evidence_ids": [],
+      "verification_ids": [],
+      "error_ids": [],
+      "extensions": {}
+    }
+  ],
+  "executions": [],
+  "evidence": [
+    {
+      "evidence_id": "ev-auth-email-1",
+      "type": "user_authorization",
+      "source": "demo_operator",
+      "supported_claims": [
+        "authorization auth-email-1 was granted for send_email"
+      ],
+      "integrity": "OBSERVED",
+      "created_at": "2026-07-26T18:56:30Z",
+      "extensions": {}
+    }
+  ],
+  "verifications": [],
+  "errors": [],
+  "extensions": {}
+}

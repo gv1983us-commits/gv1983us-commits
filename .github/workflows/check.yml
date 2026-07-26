@@ -19,3 +19,5 @@ jobs:
           python-version: "3.11"
       - name: Validate public profile
         run: python scripts/check_profile.py
+      - name: Run email-claim demo tests
+        run: python -m unittest discover -s tests -v

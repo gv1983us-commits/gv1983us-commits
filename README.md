@@ -86,15 +86,15 @@ They do **not** automatically establish:
 3. **See how records remain independent:** [CDTS in 60 seconds](https://github.com/gv1983us-commits/cdts/blob/main/spec/00_CDTS_IN_60_SECONDS.md).
 4. Then open MPAA or PCA only if your question is specifically about runtime state or process continuation.
 
-Try the smallest executable example:
+Run the complete email-claim walkthrough:
 
 ```bash
-git clone https://github.com/gv1983us-commits/behavioral-execution-contract.git
-cd behavioral-execution-contract
-python validator/bec_validate.py examples/claimed-email-without-invocation.json
+git clone https://github.com/gv1983us-commits/gv1983us-commits.git
+cd gv1983us-commits
+python demo/email-claim/run_demo.py
 ```
 
-Expected result: `WARN`, computed deployment level `PARTIAL`, and process exit code `1`. The non-zero exit is the intended fail-closed consumer signal, not a validator crash.
+The runner fetches the pinned MPAA, BEC, and CDTS revisions and executes their own validators. Expected result: MPAA `PASS` with task result `PARTIAL`; BEC `WARN` with exit code `1`; PCA `not_applicable` with no fabricated record; CDTS `ADMISSIBLE` while world truth remains `NOT_EVALUATED`; therefore **email sent: `NOT_ESTABLISHED`**. See the [full walkthrough, records, exact exit codes, and authority boundaries](demo/email-claim/README.md).
 
 ## What we need from external reviewers
 

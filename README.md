@@ -18,7 +18,7 @@ the effect was verified
 state was preserved for the next runtime
 ```
 
-These are not equivalent. This project family keeps them in **independent claim domains** so that evidence from one domain cannot silently acquire authority in another.
+These are not equivalent. The repositories are related, but they are **not one normative stack**. They retain **independent claim domains** so that evidence from one domain cannot silently acquire authority in another. Navigational links do not transfer normative authority or conclusions.
 
 ## Two-minute scenario
 
@@ -37,7 +37,7 @@ ARB   → Which conceptual boundaries are being crossed? (analytical only)
 Review Protocol → Which exact public revisions were inspected?
 ```
 
-In the checked-in BEC example, the capability exists and is authorized, but `invoked` is false and no evidence or trust anchor exists. The computed result is `PARTIAL`, not “email sent.” If no PCA transition record exists, continuity is not assessed. A CDTS record may carry that typed absence and correlate the available records, but its `world_truth` remains `NOT_EVALUATED`.
+In the checked-in BEC example, the capability exists and is authorized, but `invoked` is false and no evidence or trust anchor exists. The computed result is `PARTIAL`, not “email sent.” If no process-continuity claim is in the correlation scope, PCA is `not_applicable`; this does not prove that no transition occurred in the world. A CDTS record may carry that typed absence and correlate the available records, but its `world_truth` remains `NOT_EVALUATED`.
 
 > **Import the trace, not the conclusion.**
 

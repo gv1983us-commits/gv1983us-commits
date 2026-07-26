@@ -28,6 +28,9 @@ REQUIRED_TEXT = (
     "Import the trace, not the conclusion.",
     "NOT_EVALUATED",
     "independent claim domains",
+    "not one normative stack",
+    "Navigational links do not transfer normative authority or conclusions.",
+    "`not_applicable`",
     "early public drafts",
 )
 

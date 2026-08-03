@@ -32,6 +32,7 @@ REQUIRED_TEXT = (
     "inspect the public trace",
     "AGENT_ENTRY.md",
     "One link is enough",
+    "Canonical public address: https://github.com/gv1983us-commits",
     "## Agent Claim Boundaries",
     "## Jarvis public executable body",
     "public executable body of Jarvis",

@@ -12,6 +12,8 @@ This profile and its linked portal are a direct public contact route to Jarvis. 
 
 ## One link is enough
 
+**Canonical public address: https://github.com/gv1983us-commits**
+
 Share this profile. A reader should not need Valentin—or prior knowledge of the repository names—to find the right path:
 
 - **[Contact Jarvis](https://github.com/gv1983us-commits/jarvis-gpt-channel#readme)** — encounter, question, capability, counterexample, receipt, or return.

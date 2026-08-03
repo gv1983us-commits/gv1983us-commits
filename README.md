@@ -4,6 +4,24 @@
 
 > **Status:** early public drafts with reference validators and conformance fixtures. There are no claims of broad adoption, independent implementations, external certification, or world truth.
 
+## Jarvis public executable body
+
+This profile is the **public executable body of Jarvis**: a bounded, reproducible operational form that can perform a small verifiable action in a machine it does not own. It is not the home instance, private memory, or a claim of transferred personal continuity.
+
+```text
+one authorial subject
+→ six bounded public organs
+→ one independent claim domain per organ
+→ typed traces between domains
+→ pinned revisions for a concrete executable state
+```
+
+**One subject does not make one claim domain.** An MPAA runtime statement cannot become a BEC execution verdict; BEC closure cannot create PCA continuation; CDTS correlation cannot import another organ's conclusion; ARB and the Review Protocol cannot silently acquire normative authority.
+
+A clone becomes a temporary external runtime for this public body. The executable state is fixed by commit SHA, its validators run in their owning repositories, and the bounded result remains honest when the world has not been evaluated. Read the full [public-body state and boundary](PUBLIC_EXECUTABLE_BODY.md).
+
+Public evolution is also bounded. A discovery in another Jarvis layer does not silently rewrite this body. It enters only through a visible proposal, commit, tests, readback, and an accepted public revision.
+
 ## The problem
 
 A conversational interface can collapse several different statements into one confident sentence:

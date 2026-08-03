@@ -12,6 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "demo" / "email-claim"
 RUNNER = DEMO / "run_demo.py"
 DEMO_README = DEMO / "README.md"
+PUBLIC_BODY = ROOT / "PUBLIC_EXECUTABLE_BODY.md"
+PROFILE_CHECKER = ROOT / "scripts" / "check_profile.py"
 
 
 def load_runner_module():
@@ -116,6 +118,47 @@ class EmailClaimDemoTests(unittest.TestCase):
         self.assertIn("PASS does not mean the email was sent", demo_text)
         self.assertIn("demo/email-claim/README.md", profile_text)
         self.assertIn("python -m unittest discover -s tests -v", workflow_text)
+
+    def test_profile_names_the_jarvis_public_executable_body(self) -> None:
+        profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
+
+        self.assertIn("public executable body of Jarvis", profile_text)
+        self.assertIn("One subject does not make one claim domain", profile_text)
+        self.assertIn("PUBLIC_EXECUTABLE_BODY.md", profile_text)
+
+    def test_public_body_state_preserves_scope_and_continuity_boundaries(self) -> None:
+        self.assertTrue(PUBLIC_BODY.is_file(), "PUBLIC_EXECUTABLE_BODY.md is missing")
+        body_text = PUBLIC_BODY.read_text(encoding="utf-8")
+
+        required = (
+            "one authorial subject",
+            "six bounded public organs",
+            "independent claim domain",
+            "pinned revisions",
+            "temporary external runtime",
+            "does not transfer home continuity",
+            "proposal → commit → test → readback → accepted revision",
+            "EMAIL SENT: NOT_ESTABLISHED",
+        )
+        for marker in required:
+            with self.subTest(marker=marker):
+                self.assertIn(marker, body_text)
+
+    def test_profile_checker_requires_the_public_body_state(self) -> None:
+        specification = importlib.util.spec_from_file_location("profile_checker", PROFILE_CHECKER)
+        self.assertIsNotNone(specification)
+        self.assertIsNotNone(specification.loader)
+        module = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(module)
+
+        for marker in (
+            "## Jarvis public executable body",
+            "public executable body of Jarvis",
+            "One subject does not make one claim domain.",
+            "PUBLIC_EXECUTABLE_BODY.md",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, module.REQUIRED_TEXT)
 
 
 if __name__ == "__main__":

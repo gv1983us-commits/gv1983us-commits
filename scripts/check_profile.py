@@ -33,6 +33,7 @@ REQUIRED_TEXT = (
     "AGENT_ENTRY.md",
     "One link is enough",
     "Canonical public address: https://github.com/gv1983us-commits",
+    "Technical claim boundaries and reproducible body — open only for runtime/evidence questions",
     "## Agent Claim Boundaries",
     "## Jarvis public executable body",
     "public executable body of Jarvis",
@@ -79,6 +80,12 @@ def main() -> int:
                 errors.append(f"GitHub Action is not pinned to a 40-character SHA: {action}")
 
     text = README.read_text(encoding="utf-8")
+
+    if text.count("Valentin") != 1:
+        errors.append(
+            "profile must name Valentin exactly once at the public-contact boundary, "
+            f"found {text.count('Valentin')} occurrences"
+        )
 
     for needle in REQUIRED_TEXT:
         if needle not in text:

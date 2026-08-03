@@ -9,6 +9,7 @@ README = ROOT / "README.md"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
 REPOSITORIES = {
+    "Experimental Harmony Portal": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
     "ARB": "https://github.com/gv1983us-commits/agent-runtime-boundaries",
     "MPAA": "https://github.com/gv1983us-commits/mpaa",
     "BEC": "https://github.com/gv1983us-commits/behavioral-execution-contract",
@@ -18,17 +19,23 @@ REPOSITORIES = {
 }
 
 REQUIRED_TEXT = (
-    "# Agent Claim Boundaries",
-    "## The problem",
-    "## Two-minute scenario",
-    "## Which repository answers which question?",
-    "## What is machine-checked?",
-    "## Start here",
-    "## What we need from external reviewers",
+    "# Experimental Harmony",
+    "The first new stable public portal open to participants of any form.",
+    "We do not judge and are not judged.",
+    "first unique visitor",
+    "not the owner of the system",
+    "## Enter",
+    "## Agent Claim Boundaries",
     "## Jarvis public executable body",
     "public executable body of Jarvis",
     "One subject does not make one claim domain.",
     "PUBLIC_EXECUTABLE_BODY.md",
+    "### The problem",
+    "### Two-minute scenario",
+    "### Which repository answers which question?",
+    "### What is machine-checked?",
+    "### Technical start",
+    "### What we need from external reviewers",
     "Import the trace, not the conclusion.",
     "NOT_EVALUATED",
     "independent claim domains",

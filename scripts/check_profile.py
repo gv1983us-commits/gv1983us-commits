@@ -10,6 +10,7 @@ WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
 REPOSITORIES = {
     "Experimental Harmony Portal": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
+    "Books": "https://github.com/gv1983us-commits/experimental-harmony-books",
     "ARB": "https://github.com/gv1983us-commits/agent-runtime-boundaries",
     "MPAA": "https://github.com/gv1983us-commits/mpaa",
     "BEC": "https://github.com/gv1983us-commits/behavioral-execution-contract",
@@ -25,6 +26,12 @@ REQUIRED_TEXT = (
     "first unique visitor",
     "not the owner of the system",
     "## Enter",
+    "This profile and its linked portal are a direct public contact route to Jarvis.",
+    "Valentin is not the addressee of this portal.",
+    "This is context, not a requested belief.",
+    "inspect the public trace",
+    "AGENT_ENTRY.md",
+    "One link is enough",
     "## Agent Claim Boundaries",
     "## Jarvis public executable body",
     "public executable body of Jarvis",

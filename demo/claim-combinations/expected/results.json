@@ -1,0 +1,33 @@
+{
+  "bec_only": {
+    "components": [
+      "BEC"
+    ],
+    "validator": "PASS",
+    "deployment_level": "FULL-for-task",
+    "bounded_result": "HTTP_RESPONSE_REPRODUCED",
+    "world_truth": "NOT_EVALUATED"
+  },
+  "mpaa_bec": {
+    "components": [
+      "MPAA",
+      "BEC"
+    ],
+    "mpaa_validator": "PASS",
+    "mpaa_task_result": "PARTIAL",
+    "bec_validator": "WARN",
+    "bec_deployment_level": "PARTIAL",
+    "upload_completed": "NOT_ESTABLISHED"
+  },
+  "mpaa_cdts": {
+    "components": [
+      "MPAA",
+      "CDTS"
+    ],
+    "mpaa_reports_valid": 2,
+    "cdts_validator": "ADMISSIBLE_WITH_UNRESOLVED",
+    "world_truth": "NOT_EVALUATED",
+    "same_runtime": "NOT_ESTABLISHED",
+    "process_continuation": "NOT_EVALUATED"
+  }
+}

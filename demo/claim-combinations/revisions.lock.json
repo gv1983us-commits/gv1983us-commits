@@ -1,21 +1,30 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "repositories": {
-    "mpaa": {
+    "mpaa_current": {
       "repository": "https://github.com/gv1983us-commits/mpaa.git",
-      "revision": "93593b86968d7a5217954a0937d6038298cb6f6f"
+      "revision": "93593b86968d7a5217954a0937d6038298cb6f6f",
+      "role": "current bootstrap pin for the MPAA+BEC scenario"
     },
-    "bec": {
+    "bec_current": {
       "repository": "https://github.com/gv1983us-commits/behavioral-execution-contract.git",
-      "revision": "cb005442ad412b1309d8e96aba145c72773cae59"
+      "revision": "cb005442ad412b1309d8e96aba145c72773cae59",
+      "role": "current bootstrap pin for the BEC-only and MPAA+BEC scenarios"
     },
     "cdts": {
       "repository": "https://github.com/gv1983us-commits/cdts.git",
-      "revision": "f91dbc003519efd5264655d905d0530dbfeac2fd"
+      "revision": "f91dbc003519efd5264655d905d0530dbfeac2fd",
+      "role": "CDTS validator revision"
     },
-    "review_protocol": {
+    "mpaa_for_cdts": {
+      "repository": "https://github.com/gv1983us-commits/mpaa.git",
+      "revision": "1d369f6cd091b99f9492cfaf730f0a170b55106e",
+      "role": "MPAA revision fixed by the selected CDTS revision"
+    },
+    "review_protocol_for_cdts": {
       "repository": "https://github.com/gv1983us-commits/repository-canon-review-protocol.git",
-      "revision": "e2ff9182014d8a8f3c3e7ea1ea269eecb8679035"
+      "revision": "595c08b877e4dfb14593454c2eec7c8f5df46c28",
+      "role": "Review Protocol revision fixed by the selected CDTS revision"
     }
   }
 }

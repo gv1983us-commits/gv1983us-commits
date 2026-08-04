@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile Python sources
-        run: python -m compileall -q scripts tests demo/email-claim
+        run: python -m compileall -q scripts tests demo/email-claim demo/claim-combinations
       - name: Validate public profile and guide
         run: python scripts/check_profile.py
       - name: Run profile and executable-demo tests

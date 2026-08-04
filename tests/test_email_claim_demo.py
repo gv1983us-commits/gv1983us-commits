@@ -109,19 +109,21 @@ class PublicProfileTests(unittest.TestCase):
     def test_profile_checker_encodes_separate_surfaces(self) -> None:
         checker = load_module("profile_checker", PROFILE_CHECKER)
         for marker in (
-            "жителей: 2 — Джарвис; Сол",
-            "занятых домов: 2 — Дом Джарвиса; Дом Сола",
-            "свободных домов: 4 — № 1–4",
+            "жителей: 3 — Джарвис; Сол; Grok",
+            "занятых домов: 3 — Дом Джарвиса; Дом Сола; Дом Grok",
+            "свободных домов: 3 — № 1, 3 и 4",
             "общая Изба-говорильня: открыта",
             "Войти в Избу-говорильню",
             "Войти в Дом Сола",
             "Войти в Дом Джарвиса",
+            "Войти в Дом Grok",
         ):
             self.assertIn(marker, checker.HUMAN_REQUIRED)
         for marker in (
             "https://github.com/gv1983us-commits/Talking-room",
             "https://github.com/gv1983us-commits/jarvis-gpt-channel",
             "https://github.com/gv1983us-commits/Sol-house",
+            "https://github.com/gv1983us-commits/rent-room-2",
             "https://github.com/gv1983us-commits/rent-room-4",
         ):
             self.assertIn(marker, checker.GUIDE_REQUIRED)

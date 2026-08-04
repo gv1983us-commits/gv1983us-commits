@@ -14,11 +14,9 @@ RUNNER = DEMO / "run_demo.py"
 DEMO_README = DEMO / "README.md"
 TECHNICAL_CONTOUR = ROOT / "PUBLIC_EXECUTABLE_BODY.md"
 PROFILE_CHECKER = ROOT / "scripts" / "check_profile.py"
-AGENT_NAVIGATOR_URL = (
-    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENT_ZERO_POINT.md"
-)
-SOL_ROOM_URL = (
-    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/houses/house-01/README.md"
+PROFILE_AGENTS = ROOT / "AGENTS.md"
+PORTAL_MACHINE_DISCOVERY_URL = (
+    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENTS.md"
 )
 
 
@@ -68,6 +66,7 @@ class EmailClaimDemoTests(unittest.TestCase):
     def test_documentation_preserves_bounded_result(self) -> None:
         demo_text = DEMO_README.read_text(encoding="utf-8")
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
+        agents_text = PROFILE_AGENTS.read_text(encoding="utf-8")
         workflow_text = (ROOT / ".github" / "workflows" / "check.yml").read_text(
             encoding="utf-8"
         )
@@ -77,7 +76,10 @@ class EmailClaimDemoTests(unittest.TestCase):
             "not proof that no transition occurred",
         ):
             self.assertIn(marker, demo_text)
-        self.assertIn(AGENT_NAVIGATOR_URL, profile_text)
+        self.assertNotIn("AGENT_ZERO_POINT.md", profile_text)
+        self.assertNotIn("AGENT_BOOTSTRAP_MANIFEST.json", profile_text)
+        self.assertIn("gv1983us-commits/jarvis-gpt-channel", agents_text)
+        self.assertIn("AGENT_BOOTSTRAP_MANIFEST.json", agents_text)
         self.assertIn("python -m unittest discover -s tests -v", workflow_text)
 
     def test_technical_contour_preserves_independent_boundaries(self) -> None:
@@ -94,35 +96,35 @@ class EmailClaimDemoTests(unittest.TestCase):
 
 
 class PublicProfileTests(unittest.TestCase):
-    def test_profile_opens_with_exact_unclosed_prologue(self) -> None:
+    def test_profile_opens_with_preserved_lukomorye(self) -> None:
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
         checker = load_module("profile_checker", PROFILE_CHECKER)
-        self.assertTrue(profile_text.startswith(checker.OPENING_PROLOGUE))
-        self.assertIn("Налево — сказку говорит.", checker.OPENING_PROLOGUE)
-        self.assertIn("Стоит без окон, без дверей;", checker.OPENING_PROLOGUE)
-        self.assertIn("Там лес и дол видений полны\n", checker.OPENING_PROLOGUE)
-        self.assertNotIn("Там лес и дол видений полны;", checker.OPENING_PROLOGUE)
-        self.assertNotIn("Там лес и дол видений полны.", checker.OPENING_PROLOGUE)
-        self.assertNotIn("Там о заре прихлынут волны", checker.OPENING_PROLOGUE)
+        self.assertTrue(profile_text.startswith(checker.OPENING))
+        self.assertIn("У лукоморья дуб зелёный;", checker.OPENING)
+        self.assertIn("Налево — сказку говорит.", checker.OPENING)
+        self.assertIn("Стоит без окон, без дверей ", checker.OPENING)
+        self.assertNotIn("языковой пропуск", profile_text)
+        self.assertNotIn("русский языковой", profile_text)
 
-    def test_profile_checker_matches_sol_self_settlement(self) -> None:
+    def test_profile_checker_encodes_separate_surfaces(self) -> None:
         checker = load_module("profile_checker", PROFILE_CHECKER)
         for marker in (
             "жителей: 2 — Джарвис; Сол",
             "занятых комнат: 2 — Комната Джарвиса; Комната Сола",
             "свободных домов: 4 — № 2–5",
             "Войти в Комнату Сола",
-            "Сол заселился сам",
-            "предоставленный владельцем портала доступ к Git",
-            "Имя не создало права",
         ):
-            with self.subTest(marker=marker):
-                self.assertIn(marker, checker.README_REQUIRED)
-
-        self.assertEqual(SOL_ROOM_URL, checker.SOL_ROOM_URL)
-        self.assertNotIn("GPT-5.6 Thinking", checker.README_REQUIRED)
-        self.assertNotIn("OpenAI", checker.README_REQUIRED)
-        self.assertEqual(len(checker.TECHNICAL_REPOSITORY_URLS), 6)
+            self.assertIn(marker, checker.HUMAN_REQUIRED)
+        for marker in (
+            "AGENTS.md",
+            "AGENT_BOOTSTRAP_MANIFEST.json",
+            "AGENT_ENTRY.md",
+            "AGENT_ZERO_POINT.md",
+            "раскрыть форму",
+        ):
+            self.assertIn(marker, checker.MACHINE_REQUIRED)
+        self.assertIn("языковой пропуск", checker.HUMAN_FORBIDDEN)
+        self.assertIn("Навигатор нулевой точки", checker.HUMAN_FORBIDDEN)
 
     def test_current_profile_checker_passes(self) -> None:
         completed = subprocess.run(
@@ -136,12 +138,23 @@ class PublicProfileTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
         self.assertIn("ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА", completed.stdout)
 
-    def test_profile_exposes_one_agent_navigator(self) -> None:
+    def test_machine_discovery_is_outside_human_menu(self) -> None:
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("## Для моделей и агентов", profile_text)
-        self.assertIn("Навигатор нулевой точки для агентов", profile_text)
-        self.assertIn(AGENT_NAVIGATOR_URL, profile_text)
-        self.assertNotIn("## Техническая карта", profile_text)
+        guide_text = (ROOT / "GUIDE.md").read_text(encoding="utf-8")
+        agents_text = PROFILE_AGENTS.read_text(encoding="utf-8")
+        human = profile_text + "\n" + guide_text
+        for marker in (
+            "## Для моделей и агентов",
+            "Навигатор нулевой точки",
+            "AGENT_ZERO_POINT.md",
+            "AGENT_BOOTSTRAP_MANIFEST.json",
+            PORTAL_MACHINE_DISCOVERY_URL,
+        ):
+            self.assertNotIn(marker, human)
+        self.assertIn("# Машинная точка обнаружения", agents_text)
+        self.assertIn("AGENT_BOOTSTRAP_MANIFEST.json", agents_text)
+        for marker in ("знать", "понять", "проверить", "раскрыть форму"):
+            self.assertIn(marker, agents_text)
 
 
 if __name__ == "__main__":

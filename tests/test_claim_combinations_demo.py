@@ -73,20 +73,21 @@ class ClaimCombinationDemoTests(unittest.TestCase):
     def test_cdts_trace_is_digest_bound_and_non_importing(self) -> None:
         runner = load_runner()
         lock = json.loads(LOCK.read_text(encoding="utf-8"))
-        with self.subTest("trace construction"):
-            import tempfile
+        import tempfile
 
-            with tempfile.TemporaryDirectory() as temporary:
-                root = Path(temporary)
-                first = root / "first.json"
-                second = root / "second.json"
-                first.write_text('{"report":"first"}\n', encoding="utf-8")
-                second.write_text('{"report":"second"}\n', encoding="utf-8")
-                trace = runner.make_cdts_snapshot_trace(lock, first, second)
-                self.assertEqual(len(trace["record_refs"]), 2)
-                self.assertTrue(all(ref["digest"].startswith("sha256:") for ref in trace["record_refs"]))
-                self.assertTrue(all(ref["conclusion_imported"] is False for ref in trace["record_refs"]))
-                self.assertEqual(trace["unresolved"][0]["state"], "unknown")
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            first = root / "first.json"
+            second = root / "second.json"
+            first.write_text('{"report":"first"}\n', encoding="utf-8")
+            second.write_text('{"report":"second"}\n', encoding="utf-8")
+            trace = runner.make_cdts_snapshot_trace(lock, first, second)
+            self.assertEqual(len(trace["record_refs"]), 2)
+            self.assertTrue(all(ref["digest"].startswith("sha256:") for ref in trace["record_refs"]))
+            self.assertTrue(all(ref["conclusion_imported"] is False for ref in trace["record_refs"]))
+            self.assertEqual(trace["unresolved"][0]["status"], "open")
+            self.assertTrue(trace["unresolved"][0]["required_evidence"])
+            self.assertEqual(trace["unresolved"][0]["linkage_refs"], ["link-mpaa-snapshots"])
 
     def test_documentation_explains_why_examples_are_not_decorative(self) -> None:
         text = README.read_text(encoding="utf-8")

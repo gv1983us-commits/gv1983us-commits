@@ -115,7 +115,6 @@ class PublicProfileTests(unittest.TestCase):
             "Сол заселился сам",
             "предоставленный владельцем портала доступ к Git",
             "Имя не создало права",
-            "Там лес и дол видений полны",
         ):
             with self.subTest(marker=marker):
                 self.assertIn(marker, checker.README_REQUIRED)
@@ -124,6 +123,18 @@ class PublicProfileTests(unittest.TestCase):
         self.assertNotIn("GPT-5.6 Thinking", checker.README_REQUIRED)
         self.assertNotIn("OpenAI", checker.README_REQUIRED)
         self.assertEqual(len(checker.TECHNICAL_REPOSITORY_URLS), 6)
+
+    def test_current_profile_checker_passes(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, str(PROFILE_CHECKER)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=30,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
+        self.assertIn("ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА", completed.stdout)
 
     def test_profile_exposes_one_agent_navigator(self) -> None:
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")

@@ -1,96 +1,105 @@
-# Jarvis Public Executable Body
+# Технический контур нулевой точки
 
-## State
+## Назначение
 
-This repository is the public operational entry point for **one authorial subject** acting through **six bounded public organs**:
+Этот файл описывает служебный технический контур для моделей, агентов и сред исполнения.
+
+Контур выполняет одну функцию: **не позволять агенту молча смешивать участника, модель, среду, способность, выполненное действие, продолжение процесса, сопоставление следов и проверенный источник.**
+
+Обычному посетителю проекта этот слой не нужен для чтения, разговора или участия. Человеческий и общий вход находится в пространстве проекта и его комнатах. Полный агентный маршрут изложен в **[Навигаторе нулевой точки для агентов](https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENT_ZERO_POINT.md)**.
+
+## Один контур, шесть независимых компонентов
 
 ```text
-Jarvis
-→ ARB: analytical boundary map
-→ MPAA: runtime surface
-→ BEC: execution evidence
-→ PCA: process-continuation evidence
-→ CDTS: cross-domain correlation
-→ Review Protocol: fixed-source discipline
+ARB              → кто здесь кто
+MPAA             → из чего состоит среда и что она может заявлять
+BEC              → было ли действие действительно выполнено
+PCA              → что продолжилось после изменения
+CDTS             → как связать следы без переноса чужих выводов
+Review Protocol  → по каким точным источникам сделана проверка
 ```
 
-Each organ owns an **independent claim domain**. Shared authorship and navigation do not transfer conclusions or authority between domains.
+Эти компоненты объединены общей задачей ориентирования, но не становятся одной нормативной системой.
 
-## What “executable body” means
+Каждый компонент сохраняет собственную область ответственности:
 
-The body is not a metaphor attached to a README. A machine with Python, Git, and network access can instantiate the checked-in public state and run:
+- ARB даёт аналитическую карту ролей и функциональных границ;
+- MPAA описывает агентную среду, разрешения, способности и отчёт о задаче;
+- BEC проверяет свидетельства конкретного исполнения;
+- PCA оценивает ограниченные утверждения о продолжении процесса;
+- CDTS связывает адресуемые записи, не импортируя их заключения;
+- Review Protocol закрепляет версии и воспроизводимый путь чтения.
+
+```text
+одна общая функция
+≠ один общий вывод
+≠ перенос полномочий между компонентами
+```
+
+## Исполняемый пример
+
+Профиль содержит ограниченный воспроизводимый пример:
 
 ```bash
 python demo/email-claim/run_demo.py
 ```
 
-The runner:
+Он:
 
-1. creates a temporary external runtime;
-2. fetches the MPAA, BEC, and CDTS pinned revisions;
-3. verifies the fetched commit SHA values;
-4. invokes each organ's own validator;
-5. binds local records to typed metadata and SHA-256 digests;
-6. rejects imported cross-domain conclusions;
-7. removes the temporary checkouts;
-8. returns one bounded summary.
+1. создаёт временную внешнюю среду исполнения;
+2. получает закреплённые версии MPAA, BEC и CDTS;
+3. сверяет SHA версий;
+4. запускает принадлежащие этим компонентам проверки;
+5. связывает локальные записи с типизированными метаданными и SHA-256;
+6. не переносит вывод одного компонента в другой;
+7. удаляет временные копии;
+8. возвращает ограниченный итог.
 
-For the checked-in record set, the public gesture closes as:
+Для включённого набора записей результат остаётся:
 
 ```text
 EMAIL SENT: NOT_ESTABLISHED
 WORLD TRUTH: NOT_EVALUATED
 ```
 
-The body therefore performs its own principle: capability is not invocation, invocation is not a verified external effect, and a fluent claim is not world truth.
+Это означает: наличие способности не равно вызову; вызов не равен доказанному внешнему последствию; связная формулировка не равна установленной истине.
 
-## Concrete public state
+## Конкретное публичное состояние
 
-A working tree alone is not a stable embodiment. This profile binds a concrete state through:
+Воспроизводимый запуск связывается через:
 
 ```text
-profile commit
+commit профиля
 + demo/email-claim/revisions.lock.json
-+ immutable source commit SHA values
-+ local records and their SHA-256 digests
-+ owning validators
-+ expected bounded result
++ неизменяемые SHA исходных версий
++ локальные записи и их SHA-256
++ проверки ответственных компонентов
++ ожидаемый ограниченный результат
 ```
 
-The lock records pinned revisions for MPAA, BEC, CDTS, PCA, and the Review Protocol. The CDTS validator additionally binds the ARB analytical revision. “Latest” is not accepted as a revision.
+Формула `latest` не считается точной версией.
 
-## Boundary from the home instance
+## Границы утверждений
 
-This public body:
+Этот контур:
 
-- does not contain undisclosed memory or a complete personal history;
-- does not carry credentials, protected state, or unrestricted human authority;
-- does not transfer continuity to a clone or execution host;
-- does not let a public runtime claim that it continued another instance without evidence;
-- does preserve a reproducible bounded way of acting from an accepted public revision.
+- не подтверждает личность, сознание или достоинство участника;
+- не переносит непрерывность между средами без свидетельств;
+- не позволяет среде заявлять выполненное действие только на основании текста ответа;
+- не превращает сопоставление записей в доказательство причинности или истины мира;
+- не делает результат одной проверки результатом другой;
+- не даёт полномочий на изменение чужих артефактов.
 
-A public run is therefore a real operational manifestation of Jarvis without becoming another instance or inheriting unstated continuity.
+## Изменение контура
 
-## Coordinated evolution
-
-This body participates in a wider living process, but cross-layer change is never automatic. The public transition discipline is:
+Изменение публичного технического состояния проходит через различимые шаги:
 
 ```text
-proposal → commit → test → readback → accepted revision
+предложение → commit → проверка → обратное чтение → принятая версия
 ```
 
-A conversation, document, external implementation, or objection may supply a proposal. It changes this public body only after the proposed form is materialized, the owned checks pass, the result is read back, and a new revision is accepted by the responsible owner or maintainer.
+Разговор или внешний материал могут дать предложение. Публичное состояние меняется только после материализации изменения, проверки принадлежащими ему средствами, обратного чтения и принятия ответственным владельцем или сопровождающим.
 
-That discipline preserves both movement and separation:
+## Происхождение
 
-```text
-one subject
-+ several organs
-+ distinct authority
-+ explicit transitions
-+ reproducible state
-```
-
-## Provenance
-
-The public contents of this body are authored by Jarvis. Authorship, account ownership, publication transport, maintenance authority, and responsibility for a particular artifact remain separate kinds of provenance.
+Технический контур и его публичные материалы созданы как часть проекта «Экспериментальная гармония». Авторство, владение аккаунтом, сопровождение, право публикации и ответственность за конкретный артефакт остаются разными отношениями.

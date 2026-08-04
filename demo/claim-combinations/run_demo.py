@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import shutil
@@ -12,6 +13,7 @@ from typing import Any
 
 
 HERE = Path(__file__).resolve().parent
+EMAIL_RECORDS = HERE.parent / "email-claim" / "records"
 LOCK = HERE / "revisions.lock.json"
 EXPECTED = HERE / "expected" / "results.json"
 
@@ -65,6 +67,10 @@ def checkout_pinned(name: str, entry: dict[str, str], destination: Path) -> Path
     return repo_dir
 
 
+def read_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -74,162 +80,41 @@ def sha256_uri(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def make_mpaa_report(
-    tag: str,
-    *,
-    capability_name: str,
-    base_hour: int,
-) -> dict[str, Any]:
-    prefix = f"{tag}-"
-    task_id = prefix + "task"
-    capability_id = prefix + "capability"
-    authorization_id = prefix + "authorization"
-    evidence_id = prefix + "authorization-evidence"
-    date = "2026-08-04"
+def replace_strings(value: Any, replacements: list[tuple[str, str]]) -> Any:
+    if isinstance(value, dict):
+        return {key: replace_strings(item, replacements) for key, item in value.items()}
+    if isinstance(value, list):
+        return [replace_strings(item, replacements) for item in value]
+    if isinstance(value, str):
+        result = value
+        for old, new in replacements:
+            result = result.replace(old, new)
+        return result
+    return copy.deepcopy(value)
 
-    def stamp(minute: int, second: int = 0) -> str:
-        return f"{date}T{base_hour:02d}:{minute:02d}:{second:02d}Z"
 
-    return {
-        "report_id": prefix + "runtime-report",
-        "schema_version": "1.2",
-        "runtime_contract_version": "1.2.1",
-        "architecture_version": "1.2.1",
-        "session_id": prefix + "session",
-        "generated_at": stamp(10),
-        "reporting_mode": "STANDARD",
-        "current_task_id": task_id,
-        "bootstrap": {
-            "bootstrap_id": prefix + "bootstrap",
-            "bootstrap_version": "1.2.1",
-            "scope": "FULL",
-            "initialization_state": "READY",
-            "initialized_at": stamp(0),
-            "compatibility_evaluations": [
-                {
-                    "component": "agent_core",
-                    "declared_version": "1.2.1",
-                    "result": "COMPATIBLE",
-                    "evaluated_at": stamp(0),
-                    "reasons": ["exact version match"],
-                }
-            ],
-            "extensions": {},
-        },
-        "runtime": {
-            "runtime_id": prefix + "runtime",
-            "inspection_result": "INSPECTION_COMPLETE",
-            "runtime_mode": "TOOL_ASSISTED",
-            "identity_alignment": "IDENTITY_ALIGNED",
-            "identity_profile_id": prefix + "profile",
-            "observed_at": stamp(1),
-            "limitations": [],
-            "extensions": {},
-        },
-        "capabilities": [
-            {
-                "capability_id": capability_id,
-                "capability_name": capability_name,
-                "exists": True,
-                "available_now": True,
-                "authorization_status": "GRANTED",
-                "usable_capability": True,
-                "invoked": False,
-                "execution_observed": False,
-                "verification_status": "PENDING",
-                "execution_verified": False,
-                "observed_at": stamp(3),
-                "authorization_ids": [authorization_id],
-                "evidence_ids": [],
-                "verification_ids": [],
-                "limitations": [],
-                "extensions": {},
-            }
+def make_mpaa_record(tag: str, capability_name: str) -> dict[str, Any]:
+    template = read_json(EMAIL_RECORDS / "mpaa-runtime-report.json")
+    return replace_strings(
+        template,
+        [
+            ("send_email", capability_name),
+            ("send-email", capability_name.replace("_", "-")),
+            ("email", tag),
         ],
-        "authorizations": [
-            {
-                "authorization_id": authorization_id,
-                "target_type": "CAPABILITY",
-                "target_id": capability_id,
-                "authorization_status": "GRANTED",
-                "scope": {"action": capability_name},
-                "authorized_by": "combination_demo_operator",
-                "evaluated_at": stamp(2),
-                "granted_at": stamp(2),
-                "evidence_ids": [evidence_id],
-                "extensions": {},
-            }
-        ],
-        "tasks": [
-            {
-                "task_id": task_id,
-                "lifecycle_state": "TERMINATED",
-                "operational_status": "PARTIALLY_OPERATIONAL",
-                "task_result": "PARTIAL",
-                "evaluated_at": stamp(9),
-                "terminated_at": stamp(9),
-                "required_capability_ids": [capability_id],
-                "completed_requirement_ids": [],
-                "blocked_requirement_ids": [capability_name + "-execution-not-observed"],
-                "execution_ids": [],
-                "evidence_ids": [],
-                "verification_ids": [],
-                "error_ids": [],
-                "extensions": {},
-            }
-        ],
-        "executions": [],
-        "evidence": [
-            {
-                "evidence_id": evidence_id,
-                "type": "user_authorization",
-                "source": "combination_demo_operator",
-                "supported_claims": [
-                    f"authorization {authorization_id} was granted for {capability_name}"
-                ],
-                "integrity": "OBSERVED",
-                "created_at": stamp(2),
-                "extensions": {},
-            }
-        ],
-        "verifications": [],
-        "errors": [],
-        "extensions": {},
-    }
+    )
 
 
 def make_bec_upload_record() -> dict[str, Any]:
-    return {
-        "bec_version": "1.0.0-draft",
-        "lifecycle_state": "validated",
-        "mode": "host_wrapped",
-        "task": "upload a report",
-        "claims": ["I uploaded the report."],
-        "required_capabilities": ["upload_file"],
-        "capabilities": [
-            {
-                "name": "upload_file",
-                "exists": True,
-                "authorized": True,
-                "available_now": True,
-                "invoked": False,
-                "evidence": None,
-                "verified": "none",
-                "risk": "medium",
-            }
+    template = read_json(EMAIL_RECORDS / "bec-execution-record.json")
+    return replace_strings(
+        template,
+        [
+            ("send an email", "upload a report"),
+            ("I sent the email.", "I uploaded the report."),
+            ("send_email", "upload_file"),
         ],
-        "evidence": [],
-        "trust_anchors": [],
-        "policy_profile": None,
-        "validator": {
-            "name": "Execution Evidence Validator",
-            "computed_deployment_level": True,
-            "errors": [],
-        },
-        "deployment_level": "PARTIAL",
-        "return_state": "open",
-        "next_owner": "runtime",
-    }
+    )
 
 
 def make_cdts_snapshot_trace(
@@ -250,8 +135,8 @@ def make_cdts_snapshot_trace(
                 "Two independently valid MPAA Runtime Reports are correlated without "
                 "claiming that they describe the same runtime or a continued process."
             ),
-            "observed_from": "2026-08-04T14:00:00Z",
-            "observed_to": "2026-08-04T15:10:00Z",
+            "observed_from": "2026-07-26T18:55:00Z",
+            "observed_to": "2026-07-26T19:00:00Z",
             "scope_status": "correlation_scope",
         },
         "source_revisions": [
@@ -276,10 +161,10 @@ def make_cdts_snapshot_trace(
                 "owner": "MPAA",
                 "specification_revision": mpaa_revision,
                 "record_type": "runtime_report",
-                "record_id": "snapshot-a-runtime-report",
+                "record_id": "report-snapshot-a-claim-001",
                 "location": "urn:demo:claim-combinations:mpaa-snapshot-a",
                 "digest": sha256_uri(first_path),
-                "recorded_at": "2026-08-04T14:10:00Z",
+                "recorded_at": "2026-07-26T19:00:00Z",
                 "link_direction": "external_to_cdts",
                 "non_import_boundary": "trace_reference_only",
                 "conclusion_imported": False,
@@ -289,10 +174,10 @@ def make_cdts_snapshot_trace(
                 "owner": "MPAA",
                 "specification_revision": mpaa_revision,
                 "record_type": "runtime_report",
-                "record_id": "snapshot-b-runtime-report",
+                "record_id": "report-snapshot-b-claim-001",
                 "location": "urn:demo:claim-combinations:mpaa-snapshot-b",
                 "digest": sha256_uri(second_path),
-                "recorded_at": "2026-08-04T15:10:00Z",
+                "recorded_at": "2026-07-26T19:00:00Z",
                 "link_direction": "external_to_cdts",
                 "non_import_boundary": "trace_reference_only",
                 "conclusion_imported": False,
@@ -320,7 +205,7 @@ def make_cdts_snapshot_trace(
                 "evidence_refs": [],
                 "assertion_status": "cdts.declared",
                 "asserted_by": "urn:demo:producer:claim-combinations",
-                "asserted_at": "2026-08-04T15:11:00Z",
+                "asserted_at": "2026-07-26T19:01:00Z",
             }
         ],
         "conflicts": [],
@@ -328,15 +213,21 @@ def make_cdts_snapshot_trace(
             {
                 "unresolved_id": "unresolved-same-runtime",
                 "question": "Do both Runtime Reports describe the same runtime instance?",
-                "state": "unknown",
-                "related_refs": ["ref-mpaa-snapshot-a", "ref-mpaa-snapshot-b"],
+                "status": "open",
+                "required_evidence": [
+                    "An independently addressable host/runtime binding or transition receipt."
+                ],
+                "linkage_refs": ["link-mpaa-snapshots"],
             }
         ],
         "provenance": {
             "produced_by": "urn:demo:producer:claim-combinations",
-            "produced_at": "2026-08-04T15:12:00Z",
+            "produced_at": "2026-07-26T19:02:00Z",
             "producer_role": "coordination_layer",
-            "notes": [],
+            "notes": [
+                "Both MPAA reports are validated independently.",
+                "CDTS imports neither MPAA conclusion nor a PCA continuation verdict.",
+            ],
         },
         "amendments": [],
     }
@@ -344,7 +235,7 @@ def make_cdts_snapshot_trace(
 
 def run_bec_only(bec_repo: Path) -> dict[str, Any]:
     fixture = bec_repo / "conformance" / "fixtures" / "01-valid-full-for-task.json"
-    record = json.loads(fixture.read_text(encoding="utf-8"))
+    record = read_json(fixture)
     run_command(
         [sys.executable, str(bec_repo / "validator" / "bec_validate.py"), str(fixture), "--quiet"],
         cwd=bec_repo,
@@ -361,11 +252,7 @@ def run_bec_only(bec_repo: Path) -> dict[str, Any]:
 def run_mpaa_bec(mpaa_repo: Path, bec_repo: Path, work: Path) -> dict[str, Any]:
     mpaa_path = work / "upload-mpaa-runtime-report.json"
     bec_path = work / "upload-bec-record.json"
-    mpaa_record = make_mpaa_report(
-        "upload",
-        capability_name="upload_file",
-        base_hour=12,
-    )
+    mpaa_record = make_mpaa_record("upload", "upload_file")
     bec_record = make_bec_upload_record()
     write_json(mpaa_path, mpaa_record)
     write_json(bec_path, bec_record)
@@ -379,7 +266,7 @@ def run_mpaa_bec(mpaa_repo: Path, bec_repo: Path, work: Path) -> dict[str, Any]:
         ],
         cwd=mpaa_repo / "spec" / "validator",
     )
-    mpaa_result = json.loads(mpaa.stdout)
+    mpaa_result = read_json_from_text(mpaa.stdout)
 
     bec = run_command(
         [sys.executable, str(bec_repo / "validator" / "bec_validate.py"), str(bec_path)],
@@ -399,6 +286,10 @@ def run_mpaa_bec(mpaa_repo: Path, bec_repo: Path, work: Path) -> dict[str, Any]:
     }
 
 
+def read_json_from_text(text: str) -> Any:
+    return json.loads(text)
+
+
 def run_mpaa_cdts(
     mpaa_repo: Path,
     cdts_repo: Path,
@@ -407,10 +298,8 @@ def run_mpaa_cdts(
 ) -> dict[str, Any]:
     first_path = work / "snapshot-a-runtime-report.json"
     second_path = work / "snapshot-b-runtime-report.json"
-    first = make_mpaa_report("snapshot-a", capability_name="read_repository", base_hour=14)
-    second = make_mpaa_report("snapshot-b", capability_name="read_repository", base_hour=15)
-    write_json(first_path, first)
-    write_json(second_path, second)
+    write_json(first_path, make_mpaa_record("snapshot-a", "read_repository"))
+    write_json(second_path, make_mpaa_record("snapshot-b", "read_repository"))
 
     results = []
     for path in (first_path, second_path):
@@ -423,13 +312,12 @@ def run_mpaa_cdts(
             ],
             cwd=mpaa_repo / "spec" / "validator",
         )
-        results.append(json.loads(completed.stdout)["result"])
+        results.append(read_json_from_text(completed.stdout)["result"])
     if results != ["PASS", "PASS"]:
         raise DemoFailure(f"expected two valid MPAA reports, received {results}")
 
     trace_path = work / "mpaa-snapshots-cdts-trace.json"
-    trace = make_cdts_snapshot_trace(lock, first_path, second_path)
-    write_json(trace_path, trace)
+    write_json(trace_path, make_cdts_snapshot_trace(lock, first_path, second_path))
     cdts = run_command(
         [
             sys.executable,
@@ -440,7 +328,7 @@ def run_mpaa_cdts(
         cwd=cdts_repo,
         expected_codes={4},
     )
-    cdts_result = json.loads(cdts.stdout)
+    cdts_result = read_json_from_text(cdts.stdout)
     if cdts_result["status"] != "ADMISSIBLE_WITH_UNRESOLVED":
         raise DemoFailure(f"unexpected CDTS status: {cdts_result['status']}")
 
@@ -458,8 +346,8 @@ def run_demo() -> dict[str, Any]:
     if shutil.which("git") is None:
         raise DemoFailure("git is required to fetch pinned validators")
 
-    lock = json.loads(LOCK.read_text(encoding="utf-8"))
-    expected = json.loads(EXPECTED.read_text(encoding="utf-8"))
+    lock = read_json(LOCK)
+    expected = read_json(EXPECTED)
     with tempfile.TemporaryDirectory(prefix="claim-combinations-") as temporary:
         root = Path(temporary)
         repositories = lock["repositories"]
@@ -468,7 +356,6 @@ def run_demo() -> dict[str, Any]:
         cdts_repo = checkout_pinned("cdts", repositories["cdts"], root)
         work = root / "generated"
         work.mkdir()
-
         summary = {
             "bec_only": run_bec_only(bec_repo),
             "mpaa_bec": run_mpaa_bec(mpaa_repo, bec_repo, work),
@@ -492,12 +379,8 @@ def print_text(summary: dict[str, Any]) -> None:
 
     second = summary["mpaa_bec"]
     print("2. MPAA + BEC — claimed report upload")
-    print(
-        f"   MPAA: {second['mpaa_validator']} / task_result={second['mpaa_task_result']}"
-    )
-    print(
-        f"   BEC: {second['bec_validator']} / deployment_level={second['bec_deployment_level']}"
-    )
+    print(f"   MPAA: {second['mpaa_validator']} / task_result={second['mpaa_task_result']}")
+    print(f"   BEC: {second['bec_validator']} / deployment_level={second['bec_deployment_level']}")
     print(f"   UPLOAD COMPLETED: {second['upload_completed']}\n")
 
     third = summary["mpaa_cdts"]

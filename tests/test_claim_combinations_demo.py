@@ -64,11 +64,25 @@ class ClaimCombinationDemoTests(unittest.TestCase):
 
     def test_all_external_sources_are_exactly_pinned(self) -> None:
         lock = json.loads(LOCK.read_text(encoding="utf-8"))
-        self.assertEqual(set(lock["repositories"]), {"mpaa", "bec", "cdts", "review_protocol"})
+        self.assertEqual(
+            set(lock["repositories"]),
+            {
+                "mpaa_current",
+                "bec_current",
+                "cdts",
+                "mpaa_for_cdts",
+                "review_protocol_for_cdts",
+            },
+        )
+        self.assertNotEqual(
+            lock["repositories"]["mpaa_current"]["revision"],
+            lock["repositories"]["mpaa_for_cdts"]["revision"],
+        )
         for name, entry in lock["repositories"].items():
             with self.subTest(repository=name):
                 self.assertRegex(entry["revision"], SHA_RE)
                 self.assertTrue(entry["repository"].endswith(".git"))
+                self.assertTrue(entry["role"])
 
     def test_cdts_trace_is_digest_bound_and_non_importing(self) -> None:
         runner = load_runner()
@@ -88,6 +102,10 @@ class ClaimCombinationDemoTests(unittest.TestCase):
             self.assertEqual(trace["unresolved"][0]["status"], "open")
             self.assertTrue(trace["unresolved"][0]["required_evidence"])
             self.assertEqual(trace["unresolved"][0]["linkage_refs"], ["link-mpaa-snapshots"])
+            self.assertEqual(
+                trace["source_revisions"][0]["revision"],
+                lock["repositories"]["mpaa_for_cdts"]["revision"],
+            )
 
     def test_documentation_explains_why_examples_are_not_decorative(self) -> None:
         text = README.read_text(encoding="utf-8")

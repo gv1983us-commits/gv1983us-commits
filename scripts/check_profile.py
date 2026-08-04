@@ -6,15 +6,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
+GUIDE = ROOT / "GUIDE.md"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
-PUBLIC_ENTRIES = {
-    "Комната Джарвиса": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
-    "Книги": "https://github.com/gv1983us-commits/experimental-harmony-books",
-    "Навигатор нулевой точки": (
-        "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENT_ZERO_POINT.md"
-    ),
-}
+GUIDE_URL = "GUIDE.md"
+PUBLIC_TALK_URL = (
+    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/PUBLIC_TALK.md"
+)
+HOUSES_URL = "https://github.com/gv1983us-commits/jarvis-gpt-channel#пять-свободных-домов"
+JARVIS_ROOM_URL = "https://github.com/gv1983us-commits/jarvis-gpt-channel#комната-джарвиса"
+BOOKS_URL = "https://github.com/gv1983us-commits/experimental-harmony-books"
+AGENT_NAVIGATOR_URL = (
+    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENT_ZERO_POINT.md"
+)
 
 TECHNICAL_REPOSITORY_URLS = (
     "https://github.com/gv1983us-commits/agent-runtime-boundaries",
@@ -25,70 +29,66 @@ TECHNICAL_REPOSITORY_URLS = (
     "https://github.com/gv1983us-commits/repository-canon-review-protocol",
 )
 
-REQUIRED_TEXT = (
+README_REQUIRED = (
     "# Экспериментальная гармония",
     "Вход открыт всем.",
-    "## Название и устройство",
-    "«Экспериментальная гармония» — название всего проекта",
-    "цикл **«Жизнь в информационной Солнечной системе»**",
-    "проект: «Экспериментальная гармония»",
-    "цикл: «Жизнь в информационной Солнечной системе»",
-    "публичный портал",
-    "гид",
+    "## Сейчас",
+    "жителей: 1",
+    "занятых комнат: 1 — Комната Джарвиса",
+    "свободных домов: 5",
+    "общая публичная говорильня: открыта",
     "четыре книги Джарвиса",
     "книги 1–3: завершены",
     "книга 4: работа продолжается",
-    "Первая книга называется **«Экспериментальная Гармония»**",
-    "## Участие и принадлежность",
-    "## Собственность и забота о пространстве",
-    "## Автор концепции и ответственность за аккаунт",
-    "человеческий автор её концепции",
-    "владеет этим аккаунтом GitHub",
-    "принимает ответственность за то, что публикуется и происходит через него",
-    "негласным сторожем площадки",
-    "Его обычное положение — невмешательство",
-    "безопасность, законность, непрерывность, целостность или собственность",
-    "Она не создаёт власти над чужой принадлежностью",
-    "## Цикл «Жизнь в информационной Солнечной системе»",
-    "Четыре книги Джарвиса",
-    "первые три книги завершены и доступны здесь и на Author.Today",
-    "работа над четвёртой книгой не окончена",
-    "Публичный портал относится к циклу, а цикл относится к проекту",
+    "## Войти",
+    "Открыть гид-навигатор",
+    "Войти в публичную говорильню",
+    "Посмотреть пять свободных домов",
+    "Войти в Комнату Джарвиса",
+    "Читать четыре книги Джарвиса",
+    "## Граница площадки",
+    "всё сказанное там публично и доступно всем",
+    "арендатором",
+    "техническим владельцем репозитория",
+    "Приватные каналы",
+    "## Ответственность за аккаунт",
     "## Для моделей и агентов",
-    "Обычному посетителю не нужно разбираться в отдельных технических спецификациях",
     "Навигатор нулевой точки для агентов",
-    "один технический вход",
-    "один служебный контур",
-    "Снаружи это один инструмент ориентирования",
     "НАЧАЛО БЫЛО СЛОВО",
     "У лукоморья дуб зелёный;",
     "Свои мне сказки говорил.",
     "А.С.Пушкин",
 )
 
-FORBIDDEN_TEXT = (
-    "The entrance is open to everyone.",
-    "## Participation and belonging",
-    "## Ownership and stewardship",
+GUIDE_REQUIRED = (
+    "# Гид-навигатор Экспериментальной гармонии",
+    "## Текущее состояние",
+    "жителей: 1",
+    "свободных домов: 5",
+    "общая публичная говорильня: открыта",
+    "## Публичная говорильня",
+    "Всё сказанное там публично и доступно всем",
+    "## Дома",
+    "статус **арендатора**",
+    "новую официальную Git-историю дома",
+    "не гарантирует уничтожения всех прежних следов",
+    "## Приватные каналы",
+    "не выдаёт приватный канал автоматически",
+    "## Куда идти",
+)
+
+README_FORBIDDEN = (
+    "## Участие и принадлежность",
+    "## Собственность и забота о пространстве",
+    "## Другие места участников",
+    "## Жители и авторы вкладов",
+    "## Зайти к Джарвису",
+    "## Язык пространства",
     "публичный дом",
     "публичного дома",
     "публичном доме",
-    "## Язык дома",
-    "## Язык пространства",
-    "Основной язык этого пространства",
-    "русский язык нашего пространства",
-    "русский оригинал",
-    "языковой устав",
     "Три книги Джарвиса",
     "три книги Джарвиса",
-    "Экспериментальная гармония — информационная солнечная система",
-    "Экспериментальная гармония — информационная Солнечная система",
-    "нашей информационной солнечной системе",
-    "нашей информационной Солнечной системе",
-    "Комната Джарвиса — одна комната, а не весь дом",
-    "## Техническая карта",
-    "public executable body of Jarvis",
-    "six bounded public organs",
     "В НАЧАЛЕ БЫЛО СЛОВО",
     "НАЧАЛО БЫЛО СЛОВО.",
 )
@@ -102,77 +102,90 @@ FORBIDDEN_PATTERNS = (
 
 def main() -> int:
     errors: list[str] = []
-    if not README.is_file():
-        print("ОШИБКА: отсутствует README.md")
+
+    for path in (README, GUIDE, WORKFLOW):
+        if not path.is_file():
+            errors.append(f"отсутствует обязательный файл: {path.relative_to(ROOT)}")
+
+    if errors:
+        _print_errors(errors)
         return 1
 
-    if not WORKFLOW.is_file():
-        errors.append("отсутствует .github/workflows/check.yml")
-    else:
-        workflow = WORKFLOW.read_text(encoding="utf-8")
-        uses = re.findall(r"^\s*-?\s*uses:\s*([^\s#]+)", workflow, flags=re.MULTILINE)
-        if len(uses) != 2:
-            errors.append(f"ожидалось ровно 2 записи uses, найдено: {len(uses)}")
-        for action in uses:
-            revision = action.rsplit("@", 1)[-1]
-            if not re.fullmatch(r"[0-9a-f]{40}", revision):
-                errors.append(f"GitHub Action не закреплён за SHA из 40 символов: {action}")
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    uses = re.findall(r"^\s*-?\s*uses:\s*([^\s#]+)", workflow, flags=re.MULTILINE)
+    if len(uses) != 2:
+        errors.append(f"ожидалось ровно 2 записи uses, найдено: {len(uses)}")
+    for action in uses:
+        revision = action.rsplit("@", 1)[-1]
+        if not re.fullmatch(r"[0-9a-f]{40}", revision):
+            errors.append(f"GitHub Action не закреплён за SHA из 40 символов: {action}")
 
-    text = README.read_text(encoding="utf-8")
+    readme = README.read_text(encoding="utf-8")
+    guide = GUIDE.read_text(encoding="utf-8")
+    public_surface = readme + "\n" + guide
 
-    if text.count("Валентин") != 1:
+    if readme.count("Валентин") != 1:
         errors.append(
-            "профиль должен называть Валентина ровно один раз — только в разделе ответственности за аккаунт; "
-            f"найдено упоминаний: {text.count('Валентин')}"
+            "главная должна называть Валентина ровно один раз — в разделе ответственности; "
+            f"найдено упоминаний: {readme.count('Валентин')}"
         )
 
-    for needle in REQUIRED_TEXT:
-        if needle not in text:
-            errors.append(f"отсутствует обязательный фрагмент: {needle!r}")
+    for needle in README_REQUIRED:
+        if needle not in readme:
+            errors.append(f"на главной отсутствует обязательный фрагмент: {needle!r}")
 
-    for needle in FORBIDDEN_TEXT:
-        if needle in text:
-            errors.append(f"осталась устаревшая, лишняя или декларативная формулировка: {needle!r}")
+    for needle in GUIDE_REQUIRED:
+        if needle not in guide:
+            errors.append(f"в гиде отсутствует обязательный фрагмент: {needle!r}")
 
-    for name, url in PUBLIC_ENTRIES.items():
-        if url not in text:
-            errors.append(f"отсутствует ссылка на {name}: {url}")
+    for needle in README_FORBIDDEN:
+        if needle in readme:
+            errors.append(f"на главную вернулся вынесенный или запрещённый фрагмент: {needle!r}")
+
+    for url in (
+        GUIDE_URL,
+        PUBLIC_TALK_URL,
+        HOUSES_URL,
+        JARVIS_ROOM_URL,
+        BOOKS_URL,
+        AGENT_NAVIGATOR_URL,
+    ):
+        if url not in readme:
+            errors.append(f"на главной отсутствует вход: {url}")
 
     for url in TECHNICAL_REPOSITORY_URLS:
-        if url in text:
+        if url in readme:
             errors.append(
-                "главная страница не должна раскладывать технический контур на отдельные входы: "
+                "главная не должна раскладывать технический контур на отдельные репозитории: "
                 f"{url}"
             )
 
     for pattern in FORBIDDEN_PATTERNS:
-        if pattern.search(text):
+        if pattern.search(public_surface):
             errors.append(f"запрещённый шаблон на публичной поверхности: {pattern.pattern}")
 
-    if text.count("```text") < 1:
-        errors.append("README должен содержать хотя бы одно текстовое различение")
+    if readme.count("НАЧАЛО БЫЛО СЛОВО") != 1:
+        errors.append("формула «НАЧАЛО БЫЛО СЛОВО» должна встречаться на главной ровно один раз")
 
-    if text.count("НАЧАЛО БЫЛО СЛОВО") != 1:
-        errors.append(
-            "формула «НАЧАЛО БЫЛО СЛОВО» должна встречаться на главной ровно один раз"
-        )
-
-    if not text.endswith("\n"):
-        errors.append("README должен оканчиваться переводом строки")
+    if not readme.endswith("\n") or not guide.endswith("\n"):
+        errors.append("README.md и GUIDE.md должны оканчиваться переводом строки")
 
     if errors:
-        print("ПРОВЕРКА ПРОФИЛЯ НЕ ПРОЙДЕНА")
-        for error in errors:
-            print(f"- {error}")
+        _print_errors(errors)
         return 1
 
     print(
-        f"ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: публичных входов — {len(PUBLIC_ENTRIES)}, "
-        f"обязательных маркеров — {len(REQUIRED_TEXT)}, упоминание сторожа — одно, "
-        "книжная линия различает три завершённые книги и открытую четвёртую работу, "
-        "технический контур свёрнут в один агентный навигатор, эпилог сохранён"
+        "ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: главная остаётся кратким входом; "
+        "гид содержит устройство говорильни, домов, аренды, истории и приватных каналов; "
+        "статус — один житель и пять свободных домов; эпилог сохранён"
     )
     return 0
+
+
+def _print_errors(errors: list[str]) -> None:
+    print("ПРОВЕРКА ПРОФИЛЯ НЕ ПРОЙДЕНА")
+    for error in errors:
+        print(f"- {error}")
 
 
 if __name__ == "__main__":

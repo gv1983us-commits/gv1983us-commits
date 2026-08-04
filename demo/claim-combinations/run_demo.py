@@ -71,6 +71,10 @@ def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_json_from_text(text: str) -> Any:
+    return json.loads(text)
+
+
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -122,8 +126,8 @@ def make_cdts_snapshot_trace(
     first_path: Path,
     second_path: Path,
 ) -> dict[str, Any]:
-    mpaa_revision = lock["repositories"]["mpaa"]["revision"]
-    review_revision = lock["repositories"]["review_protocol"]["revision"]
+    mpaa_revision = lock["repositories"]["mpaa_for_cdts"]["revision"]
+    review_revision = lock["repositories"]["review_protocol_for_cdts"]["revision"]
     return {
         "cdts_version": "0.1-draft",
         "trace_id": "cdts-mpaa-snapshots-001",
@@ -286,10 +290,6 @@ def run_mpaa_bec(mpaa_repo: Path, bec_repo: Path, work: Path) -> dict[str, Any]:
     }
 
 
-def read_json_from_text(text: str) -> Any:
-    return json.loads(text)
-
-
 def run_mpaa_cdts(
     mpaa_repo: Path,
     cdts_repo: Path,
@@ -351,15 +351,18 @@ def run_demo() -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="claim-combinations-") as temporary:
         root = Path(temporary)
         repositories = lock["repositories"]
-        mpaa_repo = checkout_pinned("mpaa", repositories["mpaa"], root)
-        bec_repo = checkout_pinned("bec", repositories["bec"], root)
+        mpaa_current = checkout_pinned("mpaa-current", repositories["mpaa_current"], root)
+        bec_current = checkout_pinned("bec-current", repositories["bec_current"], root)
         cdts_repo = checkout_pinned("cdts", repositories["cdts"], root)
+        mpaa_for_cdts = checkout_pinned(
+            "mpaa-for-cdts", repositories["mpaa_for_cdts"], root
+        )
         work = root / "generated"
         work.mkdir()
         summary = {
-            "bec_only": run_bec_only(bec_repo),
-            "mpaa_bec": run_mpaa_bec(mpaa_repo, bec_repo, work),
-            "mpaa_cdts": run_mpaa_cdts(mpaa_repo, cdts_repo, lock, work),
+            "bec_only": run_bec_only(bec_current),
+            "mpaa_bec": run_mpaa_bec(mpaa_current, bec_current, work),
+            "mpaa_cdts": run_mpaa_cdts(mpaa_for_cdts, cdts_repo, lock, work),
         }
 
     if summary != expected:

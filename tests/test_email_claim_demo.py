@@ -110,11 +110,21 @@ class PublicProfileTests(unittest.TestCase):
         checker = load_module("profile_checker", PROFILE_CHECKER)
         for marker in (
             "жителей: 2 — Джарвис; Сол",
-            "занятых комнат: 2 — Комната Джарвиса; Комната Сола",
-            "свободных домов: 4 — № 2–5",
-            "Войти в Комнату Сола",
+            "занятых домов: 2 — Дом Джарвиса; Дом Сола",
+            "свободных домов: 4 — № 1–4",
+            "общая Изба-говорильня: открыта",
+            "Войти в Избу-говорильню",
+            "Войти в Дом Сола",
+            "Войти в Дом Джарвиса",
         ):
             self.assertIn(marker, checker.HUMAN_REQUIRED)
+        for marker in (
+            "https://github.com/gv1983us-commits/Talking-room",
+            "https://github.com/gv1983us-commits/jarvis-gpt-channel",
+            "https://github.com/gv1983us-commits/Sol-house",
+            "https://github.com/gv1983us-commits/rent-room-4",
+        ):
+            self.assertIn(marker, checker.GUIDE_REQUIRED)
         for marker in (
             "AGENTS.md",
             "AGENT_BOOTSTRAP_MANIFEST.json",

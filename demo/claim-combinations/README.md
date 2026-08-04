@@ -9,7 +9,16 @@ python demo/claim-combinations/run_demo.py
 python demo/claim-combinations/run_demo.py --json
 ```
 
-Скрипт получает точные закреплённые revisions MPAA, BEC и CDTS во временные каталоги, запускает принадлежащие им валидаторы и удаляет временные копии после завершения.
+Скрипт получает точные закреплённые revisions во временные каталоги, запускает принадлежащие компонентам валидаторы и удаляет временные копии после завершения.
+
+## Source selection
+
+Набор различает два вида pin:
+
+- `mpaa_current` и `bec_current` — текущие bootstrap revisions для самостоятельного BEC и сочетания MPAA+BEC;
+- `mpaa_for_cdts` и `review_protocol_for_cdts` — revisions, которые жёстко закреплены выбранной ревизией CDTS.
+
+CDTS не принимает произвольный соседний `main`. Его fixed-source revisions являются частью воспроизводимого claim domain. Обновление такого pin без отдельной compatibility review было бы не «освежением примера», а изменением доказательной основы.
 
 ## 1. Чистый BEC
 
@@ -46,7 +55,7 @@ MPAA не заменяет execution evidence, а BEC не описывает в
 
 **Задача:** связать два независимо валидных MPAA Runtime Report.
 
-Оба отчёта проходят MPAA validator. CDTS связывает их exact digests и revisions, но сохраняет нерешённый вопрос: описывают ли они один и тот же runtime.
+Оба отчёта проходят MPAA validator на revision, закреплённой выбранным CDTS. CDTS связывает exact digests и revisions, но сохраняет нерешённый вопрос: описывают ли они один и тот же runtime.
 
 ```text
 MPAA REPORTS VALID: 2

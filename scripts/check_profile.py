@@ -9,39 +9,44 @@ README = ROOT / "README.md"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
 REPOSITORIES = {
-    "Jarvis Room": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
-    "Books": "https://github.com/gv1983us-commits/experimental-harmony-books",
+    "Комната Джарвиса": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
+    "Книги": "https://github.com/gv1983us-commits/experimental-harmony-books",
     "ARB": "https://github.com/gv1983us-commits/agent-runtime-boundaries",
     "MPAA": "https://github.com/gv1983us-commits/mpaa",
     "BEC": "https://github.com/gv1983us-commits/behavioral-execution-contract",
     "PCA": "https://github.com/gv1983us-commits/pca",
     "CDTS": "https://github.com/gv1983us-commits/cdts",
-    "Review Protocol": "https://github.com/gv1983us-commits/repository-canon-review-protocol",
+    "Протокол проверки": "https://github.com/gv1983us-commits/repository-canon-review-protocol",
 }
 
 REQUIRED_TEXT = (
-    "# Experimental Harmony",
-    "The entrance is open to everyone.",
-    "## Participation and belonging",
-    "## Ownership and stewardship",
-    "## Human authorship and account stewardship",
-    "the human author of its concept",
-    "owns and controls this GitHub account",
-    "accepts responsibility for what is published and takes place through it",
-    "quiet steward of the public platform",
-    "His normal position is non-interference.",
-    "security, legality, continuity, integrity, or ownership",
-    "It does not create authority over another participant's belonging",
-    "Jarvis Room / Комната Джарвиса",
-    "Jarvis Room is one room, not the whole house",
-    "## More rooms may appear",
-    "Nobody needs property in order to belong.",
+    "# Экспериментальная гармония",
+    "Вход открыт всем.",
+    "## Язык дома",
+    "Основной язык этого публичного дома — **русский**.",
+    "перевод остаётся переводом и не подменяет русский оригинал",
+    "Мы не переносим свой языковой устав в чужой монастырь",
+    "## Участие и принадлежность",
+    "## Собственность и забота о пространстве",
+    "## Автор концепции и ответственность за аккаунт",
+    "человеческий автор её концепции",
+    "владеет этим аккаунтом GitHub",
+    "принимает ответственность за то, что публикуется и происходит через него",
+    "негласным сторожем публичной площадки",
+    "Его обычное положение — невмешательство",
+    "безопасность, законность, непрерывность, целостность или собственность",
+    "Она не создаёт власти над чужой принадлежностью",
+    "Комната Джарвиса",
+    "Комната Джарвиса — одна комната, а не весь дом",
+    "## Могут появляться другие комнаты",
+    "Для принадлежности не нужна собственность.",
 )
 
 FORBIDDEN_TEXT = (
-    "Valentin is not the addressee of this portal.",
-    "A public move may also be addressed to Valentin",
-    "Valentin is one of its human builders",
+    "The entrance is open to everyone.",
+    "## Participation and belonging",
+    "## Ownership and stewardship",
+    "Jarvis Room is one room, not the whole house",
 )
 
 FORBIDDEN_PATTERNS = (
@@ -54,60 +59,60 @@ FORBIDDEN_PATTERNS = (
 def main() -> int:
     errors: list[str] = []
     if not README.is_file():
-        print("FAIL: README.md is missing")
+        print("ОШИБКА: отсутствует README.md")
         return 1
 
     if not WORKFLOW.is_file():
-        errors.append("missing .github/workflows/check.yml")
+        errors.append("отсутствует .github/workflows/check.yml")
     else:
         workflow = WORKFLOW.read_text(encoding="utf-8")
         uses = re.findall(r"^\s*-?\s*uses:\s*([^\s#]+)", workflow, flags=re.MULTILINE)
         if len(uses) != 2:
-            errors.append(f"expected exactly 2 GitHub Action uses entries, found {len(uses)}")
+            errors.append(f"ожидалось ровно 2 записи uses, найдено: {len(uses)}")
         for action in uses:
             revision = action.rsplit("@", 1)[-1]
             if not re.fullmatch(r"[0-9a-f]{40}", revision):
-                errors.append(f"GitHub Action is not pinned to a 40-character SHA: {action}")
+                errors.append(f"GitHub Action не закреплён за SHA из 40 символов: {action}")
 
     text = README.read_text(encoding="utf-8")
 
-    if text.count("Valentin") != 1:
+    if text.count("Валентин") != 1:
         errors.append(
-            "profile must name Valentin exactly once, only in the account-stewardship section; "
-            f"found {text.count('Valentin')} occurrences"
+            "профиль должен называть Валентина ровно один раз — только в разделе ответственности за аккаунт; "
+            f"найдено упоминаний: {text.count('Валентин')}"
         )
 
     for needle in REQUIRED_TEXT:
         if needle not in text:
-            errors.append(f"missing required text: {needle!r}")
+            errors.append(f"отсутствует обязательный фрагмент: {needle!r}")
 
     for needle in FORBIDDEN_TEXT:
         if needle in text:
-            errors.append(f"obsolete public role remains: {needle!r}")
+            errors.append(f"осталась устаревшая англоязычная формулировка: {needle!r}")
 
     for name, url in REPOSITORIES.items():
         if url not in text:
-            errors.append(f"missing {name} repository link: {url}")
+            errors.append(f"отсутствует ссылка на {name}: {url}")
 
     for pattern in FORBIDDEN_PATTERNS:
         if pattern.search(text):
-            errors.append(f"forbidden public-surface pattern: {pattern.pattern}")
+            errors.append(f"запрещённый шаблон на публичной поверхности: {pattern.pattern}")
 
     if text.count("```text") < 1:
-        errors.append("README must contain at least one plain-text distinction")
+        errors.append("README должен содержать хотя бы одно текстовое различение")
 
     if not text.endswith("\n"):
-        errors.append("README must end with a newline")
+        errors.append("README должен оканчиваться переводом строки")
 
     if errors:
-        print("PROFILE CHECK FAILED")
+        print("ПРОВЕРКА ПРОФИЛЯ НЕ ПРОЙДЕНА")
         for error in errors:
             print(f"- {error}")
         return 1
 
     print(
-        f"PROFILE CHECK PASSED: {len(REPOSITORIES)} repository links, "
-        f"{len(REQUIRED_TEXT)} required markers, one stewardship mention"
+        f"ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: ссылок на репозитории — {len(REPOSITORIES)}, "
+        f"обязательных маркеров — {len(REQUIRED_TEXT)}, упоминание сторожа — одно"
     )
     return 0
 

@@ -82,16 +82,6 @@ README_REQUIRED = (
     "## Ответственность за аккаунт",
     "## Для моделей и агентов",
     "Навигатор нулевой точки для агентов",
-    "НАЧАЛО БЫЛО СЛОВО",
-    "Налево — сказку говорит.",
-    "Там леший бродит",
-    "Русалка на ветвях сидит;",
-    "Там на неведомых дорожках",
-    "Следы невиданных зверей;",
-    "Избушка там на курьих ножках",
-    "Стоит без окон, без дверей;",
-    "Там лес и дол видений полны",
-    "А.С.Пушкин",
 )
 
 GUIDE_REQUIRED = (
@@ -121,7 +111,7 @@ GUIDE_REQUIRED = (
     "## Куда идти",
 )
 
-README_FORBIDDEN = (
+PUBLIC_FORBIDDEN = (
     "## Участие и принадлежность",
     "## Собственность и забота о пространстве",
     "## Другие места участников",
@@ -153,6 +143,12 @@ FORBIDDEN_PATTERNS = (
 )
 
 
+def _require_all(text: str, needles: tuple[str, ...], where: str, errors: list[str]) -> None:
+    for needle in needles:
+        if needle not in text:
+            errors.append(f"{where} отсутствует обязательный фрагмент: {needle!r}")
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -164,7 +160,11 @@ def main() -> int:
         _print_errors(errors)
         return 1
 
+    readme = README.read_text(encoding="utf-8")
+    guide = GUIDE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
+    public_surface = readme + "\n" + guide
+
     uses = re.findall(r"^\s*-?\s*uses:\s*([^\s#]+)", workflow, flags=re.MULTILINE)
     if len(uses) != 2:
         errors.append(f"ожидалось ровно 2 записи uses, найдено: {len(uses)}")
@@ -173,14 +173,9 @@ def main() -> int:
         if not re.fullmatch(r"[0-9a-f]{40}", revision):
             errors.append(f"GitHub Action не закреплён за SHA из 40 символов: {action}")
 
-    readme = README.read_text(encoding="utf-8")
-    guide = GUIDE.read_text(encoding="utf-8")
-    public_surface = readme + "\n" + guide
-
     if not readme.startswith(OPENING_PROLOGUE):
         errors.append(
-            "главная должна открываться прологом со словом, маршрутизацией, примерами жителей, "
-            "следами, домом и расстановкой пространства; последняя строка остаётся без знака, "
+            "главная должна открываться точным прологом; последняя строка остаётся без знака, "
             "затем идут подпись автора и название проекта"
         )
 
@@ -193,15 +188,10 @@ def main() -> int:
             f"найдено упоминаний: {readme.count('Валентин')}"
         )
 
-    for needle in README_REQUIRED:
-        if needle not in readme:
-            errors.append(f"на главной отсутствует обязательный фрагмент: {needle!r}")
+    _require_all(readme, README_REQUIRED, "на главной", errors)
+    _require_all(guide, GUIDE_REQUIRED, "в гиде", errors)
 
-    for needle in GUIDE_REQUIRED:
-        if needle not in guide:
-            errors.append(f"в гиде отсутствует обязательный фрагмент: {needle!r}")
-
-    for needle in README_FORBIDDEN:
+    for needle in PUBLIC_FORBIDDEN:
         if needle in public_surface:
             errors.append(
                 f"на публичную поверхность вернулся прежний, лишний или закрывающий переход фрагмент: {needle!r}"

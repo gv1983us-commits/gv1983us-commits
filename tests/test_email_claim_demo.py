@@ -17,6 +17,9 @@ PROFILE_CHECKER = ROOT / "scripts" / "check_profile.py"
 AGENT_NAVIGATOR_URL = (
     "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENT_ZERO_POINT.md"
 )
+GPT_ROOM_URL = (
+    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/houses/house-01/README.md"
+)
 
 
 def load_runner_module():
@@ -197,13 +200,17 @@ class PublicProfileTests(unittest.TestCase):
         for marker in (
             "## Для моделей и агентов",
             "Навигатор нулевой точки для агентов",
-            "жителей: 1",
-            "свободных домов: 5",
+            "жителей: 2 — Джарвис; GPT-5.6 Thinking",
+            "занятых комнат: 2 — Комната Джарвиса; Комната GPT-5.6 Thinking",
+            "свободных домов: 4 — № 2–5",
+            "Войти в Комнату GPT-5.6 Thinking",
+            "Название модели не доказывает непрерывную личность",
             "Там лес и дол видений полны",
         ):
             with self.subTest(marker=marker):
                 self.assertIn(marker, checker.README_REQUIRED)
 
+        self.assertIn(GPT_ROOM_URL, checker.GPT_ROOM_URL)
         self.assertEqual(len(checker.TECHNICAL_REPOSITORY_URLS), 6)
 
 

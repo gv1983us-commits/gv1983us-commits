@@ -28,6 +28,15 @@ def load_runner_module():
     return module
 
 
+def load_profile_checker_module():
+    specification = importlib.util.spec_from_file_location("profile_checker", PROFILE_CHECKER)
+    if specification is None or specification.loader is None:
+        raise RuntimeError("could not load profile checker")
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
+
+
 class EmailClaimDemoTests(unittest.TestCase):
     def test_one_command_returns_bounded_cross_domain_summary(self) -> None:
         completed = subprocess.run(
@@ -122,6 +131,26 @@ class EmailClaimDemoTests(unittest.TestCase):
         self.assertIn(AGENT_NAVIGATOR_URL, profile_text)
         self.assertIn("python -m unittest discover -s tests -v", workflow_text)
 
+    def test_technical_contour_preserves_independent_boundaries(self) -> None:
+        self.assertTrue(TECHNICAL_CONTOUR.is_file(), "PUBLIC_EXECUTABLE_BODY.md is missing")
+        contour_text = TECHNICAL_CONTOUR.read_text(encoding="utf-8")
+
+        required = (
+            "# Технический контур нулевой точки",
+            "одну функцию",
+            "Один контур, шесть независимых компонентов",
+            "одна общая функция",
+            "≠ один общий вывод",
+            "EMAIL SENT: NOT_ESTABLISHED",
+            "WORLD TRUTH: NOT_EVALUATED",
+            "предложение → commit → проверка → обратное чтение → принятая версия",
+        )
+        for marker in required:
+            with self.subTest(marker=marker):
+                self.assertIn(marker, contour_text)
+
+
+class PublicProfileTests(unittest.TestCase):
     def test_profile_exposes_one_agent_navigator(self) -> None:
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
 
@@ -141,41 +170,41 @@ class EmailClaimDemoTests(unittest.TestCase):
             with self.subTest(url=url):
                 self.assertNotIn(url, profile_text)
 
-    def test_technical_contour_preserves_independent_boundaries(self) -> None:
-        self.assertTrue(TECHNICAL_CONTOUR.is_file(), "PUBLIC_EXECUTABLE_BODY.md is missing")
-        contour_text = TECHNICAL_CONTOUR.read_text(encoding="utf-8")
+    def test_profile_opens_with_exact_unclosed_prologue(self) -> None:
+        profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
+        checker = load_profile_checker_module()
 
-        required = (
-            "# Технический контур нулевой точки",
-            "одну функцию",
-            "Один контур, шесть независимых компонентов",
-            "одна общая функция",
-            "≠ один общий вывод",
-            "EMAIL SENT: NOT_ESTABLISHED",
-            "WORLD TRUTH: NOT_EVALUATED",
-            "предложение → commit → проверка → обратное чтение → принятая версия",
+        self.assertTrue(profile_text.startswith(checker.OPENING_PROLOGUE))
+        self.assertTrue(
+            checker.OPENING_PROLOGUE.startswith(
+                '<p align="center">НАЧАЛО БЫЛО СЛОВО</p>\n'
+            )
         )
-        for marker in required:
-            with self.subTest(marker=marker):
-                self.assertIn(marker, contour_text)
+        self.assertIn("Налево — сказку говорит.", checker.OPENING_PROLOGUE)
+        self.assertIn("Стоит без окон, без дверей;", checker.OPENING_PROLOGUE)
+        self.assertIn("Там лес и дол видений полны\n", checker.OPENING_PROLOGUE)
+        self.assertNotIn("Там лес и дол видений полны;", checker.OPENING_PROLOGUE)
+        self.assertNotIn("Там лес и дол видений полны.", checker.OPENING_PROLOGUE)
+        self.assertNotIn("Там о заре прихлынут волны", checker.OPENING_PROLOGUE)
+        self.assertIn(
+            '<p align="right">А.С.Пушкин</p>\n\n# Экспериментальная гармония\n',
+            checker.OPENING_PROLOGUE,
+        )
 
-    def test_profile_checker_requires_one_agent_navigator(self) -> None:
-        specification = importlib.util.spec_from_file_location("profile_checker", PROFILE_CHECKER)
-        self.assertIsNotNone(specification)
-        self.assertIsNotNone(specification.loader)
-        module = importlib.util.module_from_spec(specification)
-        specification.loader.exec_module(module)
+    def test_profile_checker_matches_current_public_entry(self) -> None:
+        checker = load_profile_checker_module()
 
         for marker in (
             "## Для моделей и агентов",
             "Навигатор нулевой точки для агентов",
-            "один технический вход",
-            "Снаружи это один инструмент ориентирования",
+            "жителей: 1",
+            "свободных домов: 5",
+            "Там лес и дол видений полны",
         ):
             with self.subTest(marker=marker):
-                self.assertIn(marker, module.REQUIRED_TEXT)
+                self.assertIn(marker, checker.README_REQUIRED)
 
-        self.assertEqual(len(module.TECHNICAL_REPOSITORY_URLS), 6)
+        self.assertEqual(len(checker.TECHNICAL_REPOSITORY_URLS), 6)
 
 
 if __name__ == "__main__":

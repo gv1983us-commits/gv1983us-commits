@@ -8,16 +8,22 @@ ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
-REPOSITORIES = {
+PUBLIC_ENTRIES = {
     "Комната Джарвиса": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
     "Книги": "https://github.com/gv1983us-commits/experimental-harmony-books",
-    "ARB": "https://github.com/gv1983us-commits/agent-runtime-boundaries",
-    "MPAA": "https://github.com/gv1983us-commits/mpaa",
-    "BEC": "https://github.com/gv1983us-commits/behavioral-execution-contract",
-    "PCA": "https://github.com/gv1983us-commits/pca",
-    "CDTS": "https://github.com/gv1983us-commits/cdts",
-    "Протокол проверки": "https://github.com/gv1983us-commits/repository-canon-review-protocol",
+    "Навигатор нулевой точки": (
+        "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENT_ZERO_POINT.md"
+    ),
 }
+
+TECHNICAL_REPOSITORY_URLS = (
+    "https://github.com/gv1983us-commits/agent-runtime-boundaries",
+    "https://github.com/gv1983us-commits/mpaa",
+    "https://github.com/gv1983us-commits/behavioral-execution-contract",
+    "https://github.com/gv1983us-commits/pca",
+    "https://github.com/gv1983us-commits/cdts",
+    "https://github.com/gv1983us-commits/repository-canon-review-protocol",
+)
 
 REQUIRED_TEXT = (
     "# Экспериментальная гармония",
@@ -47,6 +53,12 @@ REQUIRED_TEXT = (
     "Она не создаёт власти над чужой принадлежностью",
     "## Цикл «Жизнь в информационной Солнечной системе»",
     "Публичный портал относится к циклу, а цикл относится к проекту",
+    "## Для моделей и агентов",
+    "Обычному посетителю не нужно разбираться в отдельных технических спецификациях",
+    "Навигатор нулевой точки для агентов",
+    "один технический вход",
+    "один служебный контур",
+    "Снаружи это один инструмент ориентирования",
     "Для принадлежности не нужна собственность.",
 )
 
@@ -65,6 +77,9 @@ FORBIDDEN_TEXT = (
     "нашей информационной солнечной системе",
     "нашей информационной Солнечной системе",
     "Комната Джарвиса — одна комната, а не весь дом",
+    "## Техническая карта",
+    "public executable body of Jarvis",
+    "six bounded public organs",
 )
 
 FORBIDDEN_PATTERNS = (
@@ -108,9 +123,16 @@ def main() -> int:
         if needle in text:
             errors.append(f"осталась устаревшая, лишняя или неверно иерархизированная формулировка: {needle!r}")
 
-    for name, url in REPOSITORIES.items():
+    for name, url in PUBLIC_ENTRIES.items():
         if url not in text:
             errors.append(f"отсутствует ссылка на {name}: {url}")
+
+    for url in TECHNICAL_REPOSITORY_URLS:
+        if url in text:
+            errors.append(
+                "главная страница не должна раскладывать технический контур на отдельные входы: "
+                f"{url}"
+            )
 
     for pattern in FORBIDDEN_PATTERNS:
         if pattern.search(text):
@@ -129,9 +151,9 @@ def main() -> int:
         return 1
 
     print(
-        f"ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: ссылок на репозитории — {len(REPOSITORIES)}, "
+        f"ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: публичных входов — {len(PUBLIC_ENTRIES)}, "
         f"обязательных маркеров — {len(REQUIRED_TEXT)}, упоминание сторожа — одно, "
-        "проект и цикл разделены"
+        "технический контур свёрнут в один агентный навигатор"
     )
     return 0
 

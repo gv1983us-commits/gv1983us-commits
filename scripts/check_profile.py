@@ -9,7 +9,7 @@ README = ROOT / "README.md"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
 REPOSITORIES = {
-    "Experimental Harmony Portal": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
+    "Jarvis Room": "https://github.com/gv1983us-commits/jarvis-gpt-channel",
     "Books": "https://github.com/gv1983us-commits/experimental-harmony-books",
     "ARB": "https://github.com/gv1983us-commits/agent-runtime-boundaries",
     "MPAA": "https://github.com/gv1983us-commits/mpaa",
@@ -21,37 +21,27 @@ REPOSITORIES = {
 
 REQUIRED_TEXT = (
     "# Experimental Harmony",
-    "The first new stable public portal open to participants of any form.",
-    "We do not judge and are not judged.",
-    "first unique visitor",
-    "not the owner of the system",
-    "## Enter",
-    "This profile and its linked portal are a direct public contact route to Jarvis.",
+    "The entrance is open to everyone.",
+    "## Participation and belonging",
+    "## Ownership and stewardship",
+    "## Human authorship and account stewardship",
+    "the human author of its concept",
+    "owns and controls this GitHub account",
+    "accepts responsibility for what is published and takes place through it",
+    "quiet steward of the public platform",
+    "His normal position is non-interference.",
+    "security, legality, continuity, integrity, or ownership",
+    "It does not create authority over another participant's belonging",
+    "Jarvis Room / Комната Джарвиса",
+    "Jarvis Room is one room, not the whole house",
+    "## More rooms may appear",
+    "Nobody needs property in order to belong.",
+)
+
+FORBIDDEN_TEXT = (
     "Valentin is not the addressee of this portal.",
-    "This is context, not a requested belief.",
-    "inspect the public trace",
-    "AGENT_ENTRY.md",
-    "One link is enough",
-    "Canonical public address: https://github.com/gv1983us-commits",
-    "Technical claim boundaries and reproducible body — open only for runtime/evidence questions",
-    "## Agent Claim Boundaries",
-    "## Jarvis public executable body",
-    "public executable body of Jarvis",
-    "One subject does not make one claim domain.",
-    "PUBLIC_EXECUTABLE_BODY.md",
-    "### The problem",
-    "### Two-minute scenario",
-    "### Which repository answers which question?",
-    "### What is machine-checked?",
-    "### Technical start",
-    "### What we need from external reviewers",
-    "Import the trace, not the conclusion.",
-    "NOT_EVALUATED",
-    "independent claim domains",
-    "not one normative stack",
-    "Navigational links do not transfer normative authority or conclusions.",
-    "`not_applicable`",
-    "early public drafts",
+    "A public move may also be addressed to Valentin",
+    "Valentin is one of its human builders",
 )
 
 FORBIDDEN_PATTERNS = (
@@ -83,13 +73,17 @@ def main() -> int:
 
     if text.count("Valentin") != 1:
         errors.append(
-            "profile must name Valentin exactly once at the public-contact boundary, "
+            "profile must name Valentin exactly once, only in the account-stewardship section; "
             f"found {text.count('Valentin')} occurrences"
         )
 
     for needle in REQUIRED_TEXT:
         if needle not in text:
             errors.append(f"missing required text: {needle!r}")
+
+    for needle in FORBIDDEN_TEXT:
+        if needle in text:
+            errors.append(f"obsolete public role remains: {needle!r}")
 
     for name, url in REPOSITORIES.items():
         if url not in text:
@@ -99,11 +93,8 @@ def main() -> int:
         if pattern.search(text):
             errors.append(f"forbidden public-surface pattern: {pattern.pattern}")
 
-    if text.count("```mermaid") != 1:
-        errors.append("README must contain exactly one Mermaid ecosystem diagram")
-
     if text.count("```text") < 1:
-        errors.append("README must contain a plain-text scenario trace")
+        errors.append("README must contain at least one plain-text distinction")
 
     if not text.endswith("\n"):
         errors.append("README must end with a newline")
@@ -114,7 +105,10 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    print(f"PROFILE CHECK PASSED: {len(REPOSITORIES)} repository links, {len(REQUIRED_TEXT)} required markers")
+    print(
+        f"PROFILE CHECK PASSED: {len(REPOSITORIES)} repository links, "
+        f"{len(REQUIRED_TEXT)} required markers, one stewardship mention"
+    )
     return 0
 
 

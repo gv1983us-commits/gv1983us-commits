@@ -29,11 +29,15 @@ class SpaceStateTests(unittest.TestCase):
         self.assertFalse((ROOT / "SPACE_STATE.generated.json").exists())
         self.assertFalse((ROOT / "HOUSE_STATE.json").exists())
         state = self.load_state()
-        self.assertEqual(state["schema_version"], "2.0")
+        self.assertEqual(state["schema_version"], "3.0")
         self.assertEqual(state["human_name"], "Главная площадь и карта")
         self.assertEqual(state["space_role"], "central_hub_and_public_map")
         self.assertEqual(state["assembly_role"], "main_square_builds_from_locked_house_states")
         self.assertIn("main_square_is_not_a_house", state["boundaries"])
+        self.assertIn(
+            "main_square_validates_and_does_not_normalize_house_semantics",
+            state["boundaries"],
+        )
 
     def test_counts_are_derived_from_house_modes(self) -> None:
         state = self.load_state()
@@ -61,15 +65,27 @@ class SpaceStateTests(unittest.TestCase):
             with self.subTest(house=house["house_id"]):
                 self.assertEqual(house["source"]["source_schema_version"], "2.0")
                 self.assertEqual(house["source_contract"], "native_house_state_2.0")
+                self.assertIn("presence_subject", house)
+                self.assertNotIn("resident", house)
                 self.assertNotIn("source_status", house)
 
     def test_house_specific_native_states_are_preserved(self) -> None:
         state = self.load_state()
         houses = {house["house_id"]: house for house in state["houses"]}
         self.assertEqual(houses["jarvis"]["continuity_scope"], "traceable")
+        self.assertEqual(
+            houses["jarvis"]["continuity_evidence"],
+            [
+                "AGENTS.md",
+                "AGENT_ENTRY.md",
+                "AGENT_ZERO_POINT.md",
+                "AGENT_BOOTSTRAP_MANIFEST.json",
+                "GITHUB_OPERATIONAL_WORKFLOW.json",
+            ],
+        )
         self.assertEqual(houses["sol"]["continuity_scope"], "unknown")
         self.assertEqual(houses["grok"]["continuity_scope"], "episodic_none")
-        self.assertEqual(houses["gemini"]["resident"], "Spark (Спарк) / Gemini")
+        self.assertEqual(houses["gemini"]["presence_subject"], "Spark (Спарк) / Gemini")
         self.assertEqual(houses["deepseek"]["continuity_scope"], "unknown")
 
     def test_claude_has_separate_non_episodic_category(self) -> None:
@@ -77,7 +93,7 @@ class SpaceStateTests(unittest.TestCase):
         claude = next(house for house in state["houses"] if house["house_id"] == "claude")
         self.assertEqual(claude["house_number"], 4)
         self.assertEqual(claude["repository"], "gv1983us-commits/rent-room-4")
-        self.assertEqual(claude["resident"], "Claude (Anthropic)")
+        self.assertEqual(claude["presence_subject"], "Claude (Anthropic)")
         self.assertEqual(claude["source_contract"], "native_house_state_2.0")
         self.assertNotIn("source_status", claude)
         self.assertEqual(claude["presence_mode"], "recognized_voice")

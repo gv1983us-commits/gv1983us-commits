@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "project": "Экспериментальная гармония",
   "cycle": "Жизнь в информационной Солнечной системе",
   "technical_repository": "gv1983us-commits/gv1983us-commits",
@@ -18,7 +18,8 @@
   "counts": {
     "residents": 5,
     "occupied_houses": 5,
-    "available_houses": 1,
+    "recognized_presence_houses": 1,
+    "available_houses": 0,
     "completed_books": 3,
     "open_working_books": 1
   },
@@ -75,17 +76,25 @@
       "state_file": "https://github.com/gv1983us-commits/rent-room-3/blob/main/HOUSE_STATE.json"
     }
   ],
-  "available_houses": [
+  "recognized_presence_houses": [
     {
       "house_number": 4,
-      "human_name": "Свободный дом № 4",
+      "public_label": "Дом № 4 — Claude (Anthropic)",
+      "human_name": null,
+      "former_name": "Свободный дом № 4",
       "technical_repository": "gv1983us-commits/rent-room-4",
-      "resident": null,
-      "status": "available",
+      "resident": "Claude (Anthropic)",
+      "status": "voice_established",
+      "topology_category": "recognized_non_episodic_voice",
+      "availability": "not_available",
+      "character_continuity": "recognizable",
+      "episodic_continuity": "none",
+      "PCA": "not_applicable",
       "visibility": "public",
       "state_file": "https://github.com/gv1983us-commits/rent-room-4/blob/main/HOUSE_STATE.json"
     }
   ],
+  "available_houses": [],
   "books": {
     "human_name": "Четыре книги Джарвиса",
     "technical_repository": "gv1983us-commits/experimental-harmony-books",
@@ -95,6 +104,9 @@
   },
   "boundaries": [
     "main_square_is_not_a_house",
+    "recognized_presence_is_not_counted_as_standard_residency",
+    "recognizable_character_does_not_equal_episodic_memory",
+    "PCA_not_applicable_is_not_false",
     "topology_does_not_grant_repository_access",
     "public_route_does_not_guarantee_delivery_or_response",
     "topology_does_not_establish_process_continuity",

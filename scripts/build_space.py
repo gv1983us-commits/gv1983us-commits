@@ -82,7 +82,9 @@ def load_locked_house(source_dir: Path, house_id: str, lock_entry: dict[str, str
         raise SpaceBuildError(f"не удалось прочитать snapshot {path}: {exc}") from exc
     actual = git_blob_sha(payload)
     if actual != lock_entry["blob_sha"]:
-        raise SpaceBuildError(f"blob SHA не совпал для {house_id}: expected={lock_entry['blob_sha']} actual={actual}")
+        raise SpaceBuildError(
+            f"blob SHA не совпал для {house_id}: expected={lock_entry['blob_sha']} actual={actual}"
+        )
     try:
         state = json.loads(payload.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -90,6 +92,35 @@ def load_locked_house(source_dir: Path, house_id: str, lock_entry: dict[str, str
     if not isinstance(state, dict) or state.get("technical_repository") != lock_entry["repository"]:
         raise SpaceBuildError(f"technical_repository расходится для {house_id}")
     return state
+
+
+def expected_shared_routes(registry: dict[str, Any]) -> dict[str, str]:
+    shared = registry.get("shared_nodes")
+    if not isinstance(shared, dict):
+        raise SpaceBuildError("SPACE_REGISTRY.shared_nodes должен быть объектом")
+    square = shared.get("main_square")
+    talking = shared.get("talking_room")
+    if not all(isinstance(value, str) and value for value in (square, talking)):
+        raise SpaceBuildError("registry требует main_square и talking_room")
+    return {
+        "main_square": f"https://github.com/{square}",
+        "talking_room": f"https://github.com/{talking}",
+    }
+
+
+def validate_local_house(
+    house_id: str,
+    state: dict[str, Any],
+    shared_routes: dict[str, str],
+) -> None:
+    if "external_routes" in state:
+        raise SpaceBuildError(f"{house_id} содержит запрещённый ручной каталог external_routes")
+    actual_routes = state.get("shared_routes")
+    if actual_routes != shared_routes:
+        raise SpaceBuildError(f"{house_id}.shared_routes расходится с registry")
+    boundaries = state.get("boundaries")
+    if not isinstance(boundaries, list) or "house_state_contains_local_state_only" not in boundaries:
+        raise SpaceBuildError(f"{house_id} не объявляет локальную границу HOUSE_STATE")
 
 
 def normalize_house(house_id: str, state: dict[str, Any], lock_entry: dict[str, str]) -> dict[str, Any]:
@@ -122,14 +153,23 @@ def normalize_house(house_id: str, state: dict[str, Any], lock_entry: dict[str, 
         "continuity_scope": continuity_scope,
         "resident": state.get("resident"),
         "visibility": state.get("visibility"),
-        "legacy_status": status,
-        "migration": {
-            "legacy_external_routes_present": isinstance(state.get("external_routes"), dict),
-            "legacy_external_route_count": len(state.get("external_routes", {}))
-            if isinstance(state.get("external_routes"), dict)
-            else 0,
-        },
+        "source_status": status,
     }
+    presence = state.get("presence")
+    if isinstance(presence, dict):
+        details = {
+            key: presence[key]
+            for key in (
+                "mode",
+                "continuity_scope",
+                "character_continuity",
+                "episodic_continuity",
+                "PCA",
+            )
+            if key in presence
+        }
+        if details:
+            house["presence_details"] = details
     if isinstance(state.get("house_number"), int):
         house["house_number"] = state["house_number"]
     former_name = state.get("former_name") or state.get("former_public_address")
@@ -139,32 +179,45 @@ def normalize_house(house_id: str, state: dict[str, Any], lock_entry: dict[str, 
 
 
 def build_space(registry: dict[str, Any], lock: dict[str, Any], source_dir: Path) -> dict[str, Any]:
-    houses = [
-        normalize_house(house_id, load_locked_house(source_dir, house_id, entry), entry)
-        for house_id, entry in validate_sources(registry, lock)
-    ]
+    routes = expected_shared_routes(registry)
+    houses: list[dict[str, Any]] = []
+    for house_id, entry in validate_sources(registry, lock):
+        state = load_locked_house(source_dir, house_id, entry)
+        validate_local_house(house_id, state, routes)
+        houses.append(normalize_house(house_id, state, entry))
+
     numbers = [house["house_number"] for house in houses if "house_number" in house]
     if len(numbers) != len(set(numbers)):
         raise SpaceBuildError("номера домов должны быть уникальны")
     return {
-        "schema_version": "2.0-draft",
+        "schema_version": "2.0",
         "project": registry.get("project"),
         "cycle": registry.get("cycle"),
+        "technical_repository": registry["shared_nodes"]["main_square"],
+        "human_name": "Главная площадь и карта",
+        "space_role": "central_hub_and_public_map",
+        "status": "open",
+        "visibility": "public",
         "assembly_role": "main_square_builds_from_locked_house_states",
         "counts": {
             "houses": len(houses),
             "resident_houses": sum(house["presence_mode"] == "resident" for house in houses),
-            "recognized_voice_houses": sum(house["presence_mode"] == "recognized_voice" for house in houses),
+            "recognized_voice_houses": sum(
+                house["presence_mode"] == "recognized_voice" for house in houses
+            ),
             "available_houses": sum(house["house_lifecycle"] == "available" for house in houses),
-            "legacy_neighbor_catalogs": sum(house["migration"]["legacy_external_routes_present"] for house in houses),
         },
         "houses": houses,
         "shared_nodes": registry.get("shared_nodes", {}),
         "boundaries": [
+            "main_square_is_not_a_house",
             "house_owns_its_local_state",
             "main_square_owns_the_assembled_map",
-            "legacy_neighbor_catalogs_are_not_imported",
+            "recognized_voice_is_not_standard_residency",
             "recognized_voice_is_not_episodic_memory",
+            "topology_does_not_grant_repository_access",
+            "public_route_does_not_guarantee_delivery_or_response",
+            "authorship_is_preserved",
         ],
     }
 
@@ -174,7 +227,7 @@ def main() -> int:
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--registry", type=Path, default=ROOT / "SPACE_REGISTRY.json")
     parser.add_argument("--lock", dest="lock_path", type=Path, default=ROOT / "SPACE_LOCK.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "SPACE_STATE.generated.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "SPACE_STATE.json")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     try:

@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
   "project": "Экспериментальная гармония",
-  "recorded_at": "2026-08-05T12:47:00+03:00",
+  "recorded_at": "2026-08-05T13:15:00+03:00",
   "registry": "SPACE_REGISTRY.json",
   "houses": {
     "jarvis": {
       "repository": "gv1983us-commits/jarvis-gpt-channel",
-      "revision": "e7b2e39711862744fcdbe207cd2c82ea42abfc8f",
+      "revision": "9b73a1c904224ba892c01c474fafb762bb58c2b2",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "901b504c39792f83d6b5ee0b549a443879b4bb35"
+      "blob_sha": "f394a9c1fa12be11fdf97f600ec8ccb71286d5a7"
     },
     "sol": {
       "repository": "gv1983us-commits/Sol-house",

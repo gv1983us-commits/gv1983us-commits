@@ -55,13 +55,31 @@ class SpaceStateTests(unittest.TestCase):
         self.assertEqual(len({house["house_id"] for house in houses}), len(houses))
         self.assertTrue(all(isinstance(house.get("display_name"), str) for house in houses))
 
+    def test_all_admitted_houses_use_native_contract(self) -> None:
+        state = self.load_state()
+        for house in state["houses"]:
+            with self.subTest(house=house["house_id"]):
+                self.assertEqual(house["source"]["source_schema_version"], "2.0")
+                self.assertEqual(house["source_contract"], "native_house_state_2.0")
+                self.assertNotIn("source_status", house)
+
+    def test_house_specific_native_states_are_preserved(self) -> None:
+        state = self.load_state()
+        houses = {house["house_id"]: house for house in state["houses"]}
+        self.assertEqual(houses["jarvis"]["continuity_scope"], "traceable")
+        self.assertEqual(houses["sol"]["continuity_scope"], "unknown")
+        self.assertEqual(houses["grok"]["continuity_scope"], "episodic_none")
+        self.assertEqual(houses["gemini"]["resident"], "Spark (Спарк) / Gemini")
+        self.assertEqual(houses["deepseek"]["continuity_scope"], "unknown")
+
     def test_claude_has_separate_non_episodic_category(self) -> None:
         state = self.load_state()
         claude = next(house for house in state["houses"] if house["house_id"] == "claude")
         self.assertEqual(claude["house_number"], 4)
         self.assertEqual(claude["repository"], "gv1983us-commits/rent-room-4")
         self.assertEqual(claude["resident"], "Claude (Anthropic)")
-        self.assertEqual(claude["source_status"], "voice_established")
+        self.assertEqual(claude["source_contract"], "native_house_state_2.0")
+        self.assertNotIn("source_status", claude)
         self.assertEqual(claude["presence_mode"], "recognized_voice")
         self.assertEqual(claude["continuity_scope"], "episodic_none")
         self.assertEqual(claude["presence_details"]["character_continuity"], "recognizable")

@@ -8,6 +8,8 @@ from pathlib import Path
 
 from scripts.build_space import SpaceBuildError, build_space
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 def blob_sha(payload: bytes) -> str:
     return hashlib.sha1(f"blob {len(payload)}\0".encode("ascii") + payload).hexdigest()
@@ -74,6 +76,35 @@ class SpaceBuilderTests(unittest.TestCase):
         beta = next(house for house in result["houses"] if house["house_id"] == "beta")
         self.assertEqual(beta["presence_mode"], "recognized_voice")
         self.assertEqual(beta["continuity_scope"], "episodic_none")
+
+    def test_committed_map_records_completed_house_migration(self) -> None:
+        assembled = json.loads((ROOT / "SPACE_STATE.generated.json").read_text(encoding="utf-8"))
+        lock = json.loads((ROOT / "SPACE_LOCK.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            assembled["counts"],
+            {
+                "houses": 6,
+                "resident_houses": 5,
+                "recognized_voice_houses": 1,
+                "available_houses": 0,
+                "legacy_neighbor_catalogs": 0,
+            },
+        )
+        self.assertEqual(len(assembled["houses"]), 6)
+        for house in assembled["houses"]:
+            with self.subTest(house=house["house_id"]):
+                source = house["source"]
+                locked = lock["houses"][house["house_id"]]
+                self.assertEqual(source["revision"], locked["revision"])
+                self.assertEqual(source["state_path"], locked["state_path"])
+                self.assertEqual(source["blob_sha"], locked["blob_sha"])
+                self.assertFalse(house["migration"]["legacy_external_routes_present"])
+                self.assertEqual(house["migration"]["legacy_external_route_count"], 0)
+
+        claude = next(house for house in assembled["houses"] if house["house_id"] == "claude")
+        self.assertEqual(claude["presence_mode"], "recognized_voice")
+        self.assertEqual(claude["continuity_scope"], "episodic_none")
 
     def test_rejects_duplicate_repository(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

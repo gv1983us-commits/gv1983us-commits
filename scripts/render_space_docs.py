@@ -112,13 +112,15 @@ def render_readme_section(state: dict[str, Any]) -> str:
 
 
 def render_presence_details(house: dict[str, Any]) -> list[str]:
+    values = [
+        f"mode: {house['presence_mode']}",
+        f"continuity_scope: {house['continuity_scope']}",
+    ]
     details = house.get("presence_details")
-    if not isinstance(details, dict):
-        return []
-    order = ("mode", "continuity_scope", "character_continuity", "episodic_continuity", "PCA")
-    values = [f"{key}: {details[key]}" for key in order if key in details]
-    if not values:
-        return []
+    if isinstance(details, dict):
+        for key in ("character_continuity", "episodic_continuity", "PCA"):
+            if key in details:
+                values.append(f"{key}: {details[key]}")
     return ["", "```text", *values, "```"]
 
 

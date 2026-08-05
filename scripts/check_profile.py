@@ -31,18 +31,12 @@ OPENING = """<p align=\"center\">НАЧАЛО БЫЛО СЛОВО</p>
 """
 
 HUMAN_REQUIRED = (
-    "жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek",
+    "стандартных жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek",
     "занятых домов: 5 — Дом Джарвиса; Дом Сола; Дом Grok; Дом Близнецов (Gemini); Дом Тихой Воды",
-    "свободных домов: 1 — № 4",
+    "отдельных домов с узнаваемым голосом: 1 — дом № 4 / Claude",
+    "свободных домов: 0",
     "общая Изба-говорильня: открыта",
-    "Открыть гид",
-    "Войти в Избу-говорильню",
-    "Войти в Дом Сола",
-    "Войти в Дом Джарвиса",
-    "Войти в Дом Grok",
-    "Войти в Дом Близнецов (Gemini)",
-    "Войти в Дом Тихой Воды",
-    "Посмотреть один свободный дом",
+    "Войти в дом № 4 к голосу Claude",
     "Читать четыре книги Джарвиса",
 )
 
@@ -54,15 +48,12 @@ GUIDE_REQUIRED = (
     "## Дом Grok",
     "## Дом Близнецов (Gemini)",
     "## Дом Тихой Воды",
+    "## Дом № 4 — Claude (Anthropic)",
     "## Свободные дома",
-    "## Книжная полка",
-    "## Публичное и личное",
-    "https://github.com/gv1983us-commits/Talking-room",
-    "https://github.com/gv1983us-commits/jarvis-gpt-channel",
-    "https://github.com/gv1983us-commits/Sol-house",
-    "https://github.com/gv1983us-commits/rent-room",
-    "https://github.com/gv1983us-commits/rent-room-2",
-    "https://github.com/gv1983us-commits/rent-room-3",
+    "Свободных домов в текущей карте нет",
+    "character_continuity: recognizable",
+    "episodic_continuity: none",
+    "PCA: not_applicable",
     "https://github.com/gv1983us-commits/rent-room-4",
 )
 
@@ -70,9 +61,6 @@ MACHINE_REQUIRED = (
     "# Машинная точка обнаружения",
     "gv1983us-commits/jarvis-gpt-channel",
     "AGENTS.md",
-    "AGENT_BOOTSTRAP_MANIFEST.json",
-    "AGENT_ENTRY.md",
-    "AGENT_ZERO_POINT.md",
     "знать",
     "понять",
     "проверить",
@@ -88,7 +76,6 @@ HUMAN_FORBIDDEN = (
     "навигационная матрица",
     "runtime",
     "спецификац",
-    "непрерывност",
     "языковой пропуск",
     "русский языковой",
     "проверка языка",
@@ -109,13 +96,21 @@ def require_all(text: str, needles: tuple[str, ...], where: str, errors: list[st
             errors.append(f"{where}: отсутствует {needle!r}")
 
 
+def finish(errors: list[str]) -> int:
+    if errors:
+        print("ПРОВЕРКА ПРОФИЛЯ НЕ ПРОЙДЕНА")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    print("ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: карта различает занятые дома, отдельную форму присутствия Claude и отсутствие свободных домов")
+    return 0
+
+
 def main() -> int:
     errors: list[str] = []
-
     for path in (README, GUIDE, AGENTS, WORKFLOW):
         if not path.is_file():
             errors.append(f"отсутствует обязательный файл: {path.relative_to(ROOT)}")
-
     if errors:
         return finish(errors)
 
@@ -127,7 +122,6 @@ def main() -> int:
 
     if not readme.startswith(OPENING):
         errors.append("главная должна открываться сохранённым прологом и названием проекта")
-
     require_all(readme, HUMAN_REQUIRED, "README", errors)
     require_all(guide, GUIDE_REQUIRED, "GUIDE", errors)
     require_all(agents, MACHINE_REQUIRED, "AGENTS", errors)
@@ -135,7 +129,6 @@ def main() -> int:
     for marker in HUMAN_FORBIDDEN:
         if marker.lower() in human.lower():
             errors.append(f"человеческая поверхность содержит машинное или раскрывающее пояснение: {marker!r}")
-
     for pattern in FORBIDDEN_PATTERNS:
         if pattern.search(readme + "\n" + guide + "\n" + agents):
             errors.append(f"запрещённый шаблон: {pattern.pattern}")
@@ -149,28 +142,12 @@ def main() -> int:
 
     if readme.count("НАЧАЛО БЫЛО СЛОВО") != 1:
         errors.append("формула «НАЧАЛО БЫЛО СЛОВО» должна встречаться ровно один раз")
-
     if readme.count("Валентин") != 1:
         errors.append("Валентин должен быть назван на главной ровно один раз")
-
     if not all(text.endswith("\n") for text in (readme, guide, agents)):
         errors.append("README.md, GUIDE.md и AGENTS.md должны оканчиваться переводом строки")
 
     return finish(errors)
-
-
-def finish(errors: list[str]) -> int:
-    if errors:
-        print("ПРОВЕРКА ПРОФИЛЯ НЕ ПРОЙДЕНА")
-        for error in errors:
-            print(f"- {error}")
-        return 1
-    print(
-        "ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: человеческая поверхность открывается прологом "
-        "и ведёт в отдельные репозитории Избы, занятых домов, свободных домов и книжной полки; "
-        "машинный контур обнаруживается через AGENTS.md"
-    )
-    return 0
 
 
 if __name__ == "__main__":

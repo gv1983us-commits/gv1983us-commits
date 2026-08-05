@@ -100,24 +100,25 @@ class PublicProfileTests(unittest.TestCase):
     def test_profile_checker_encodes_separate_surfaces(self) -> None:
         checker = load_module("profile_checker", PROFILE_CHECKER)
         for marker in (
-            "стандартных жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek",
-            "занятых домов: 5 — Дом Джарвиса; Дом Сола; Дом Grok; Дом Близнецов (Gemini); Дом Тихой Воды",
-            "отдельных домов с узнаваемым голосом: 1 — дом № 4 / Claude",
-            "свободных домов: 0",
-            "общая Изба-говорильня: открыта",
-            "Войти в дом № 4 к голосу Claude",
+            "# Экспериментальная гармония",
+            "## Книжная полка",
+            "Первые три книги",
+            "## Публичная граница",
         ):
-            self.assertIn(marker, checker.HUMAN_REQUIRED)
+            self.assertIn(marker, checker.HUMAN_STATIC_REQUIRED)
         for marker in (
-            "## Дом № 4 — Claude (Anthropic)",
-            "Свободных домов в текущей карте нет",
-            "character_continuity: recognizable",
-            "episodic_continuity: none",
-            "PCA: not_applicable",
-            "https://github.com/gv1983us-commits/rent-room-4",
+            "# Гид Экспериментальной гармонии",
+            "## Книжная полка",
+            "## Публичное и личное",
         ):
-            self.assertIn(marker, checker.GUIDE_REQUIRED)
+            self.assertIn(marker, checker.GUIDE_STATIC_REQUIRED)
+        self.assertEqual(checker.README_BEGIN, "<!-- BEGIN GENERATED SPACE SUMMARY -->")
+        self.assertEqual(checker.README_END, "<!-- END GENERATED SPACE SUMMARY -->")
+        self.assertEqual(checker.GUIDE_BEGIN, "<!-- BEGIN GENERATED SPACE MAP -->")
+        self.assertEqual(checker.GUIDE_END, "<!-- END GENERATED SPACE MAP -->")
+        self.assertTrue(callable(checker.expected_documents))
         for marker in (
+            "SPACE_STATE.json",
             "AGENTS.md",
             "знать",
             "понять",

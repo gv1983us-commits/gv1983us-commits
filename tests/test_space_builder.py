@@ -19,25 +19,42 @@ class SpaceBuilderTests(unittest.TestCase):
     def make_inputs(self, root: Path) -> tuple[dict, dict, Path]:
         source_dir = root / "houses"
         source_dir.mkdir()
+        shared_nodes = {
+            "main_square": "owner/square",
+            "talking_room": "owner/talking",
+        }
+        shared_routes = {
+            "main_square": "https://github.com/owner/square",
+            "talking_room": "https://github.com/owner/talking",
+        }
         states = {
             "alpha": {
-                "schema_version": "1.3",
+                "schema_version": "1.5",
                 "technical_repository": "owner/alpha",
                 "human_name": "Дом Альфа",
                 "resident": "Альфа",
                 "status": "occupied",
                 "visibility": "public",
-                "external_routes": {"beta": "https://example.invalid/beta"},
+                "shared_routes": shared_routes,
+                "boundaries": ["house_state_contains_local_state_only"],
             },
             "beta": {
-                "schema_version": "1.2",
+                "schema_version": "1.5",
                 "technical_repository": "owner/beta",
                 "public_label": "Дом Бета",
                 "house_number": 4,
                 "resident": "Бета",
                 "status": "voice_established",
                 "visibility": "public",
-                "external_routes": {"alpha": "https://example.invalid/alpha"},
+                "presence": {
+                    "mode": "recognized_voice",
+                    "continuity_scope": "episodic_none",
+                    "character_continuity": "recognizable",
+                    "episodic_continuity": "none",
+                    "PCA": "not_applicable",
+                },
+                "shared_routes": shared_routes,
+                "boundaries": ["house_state_contains_local_state_only"],
             },
         }
         registry = {
@@ -45,7 +62,7 @@ class SpaceBuilderTests(unittest.TestCase):
             "project": "Тест",
             "cycle": "Тестовый цикл",
             "houses": [],
-            "shared_nodes": {"main_square": "owner/square"},
+            "shared_nodes": shared_nodes,
         }
         lock = {"schema_version": "1.0", "houses": {}}
         for house_id, state in states.items():
@@ -63,35 +80,37 @@ class SpaceBuilderTests(unittest.TestCase):
             }
         return registry, lock, source_dir
 
-    def test_builds_map_without_copying_neighbor_catalogs(self) -> None:
+    def test_builds_canonical_map_from_local_states(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             registry, lock, source_dir = self.make_inputs(Path(temp))
             result = build_space(registry, lock, source_dir)
 
-        self.assertEqual(result["counts"]["houses"], 2)
-        self.assertEqual(result["counts"]["resident_houses"], 1)
-        self.assertEqual(result["counts"]["recognized_voice_houses"], 1)
-        self.assertEqual(result["counts"]["legacy_neighbor_catalogs"], 2)
-        self.assertNotIn("external_routes", result["houses"][0])
+        self.assertEqual(result["schema_version"], "2.0")
+        self.assertEqual(
+            result["counts"],
+            {
+                "houses": 2,
+                "resident_houses": 1,
+                "recognized_voice_houses": 1,
+                "available_houses": 0,
+            },
+        )
         beta = next(house for house in result["houses"] if house["house_id"] == "beta")
         self.assertEqual(beta["presence_mode"], "recognized_voice")
         self.assertEqual(beta["continuity_scope"], "episodic_none")
+        self.assertEqual(beta["presence_details"]["PCA"], "not_applicable")
+        self.assertNotIn("external_routes", json.dumps(result))
 
-    def test_committed_map_records_completed_house_migration(self) -> None:
-        assembled = json.loads((ROOT / "SPACE_STATE.generated.json").read_text(encoding="utf-8"))
+    def test_committed_map_matches_lock_and_has_no_second_generated_map(self) -> None:
+        assembled = json.loads((ROOT / "SPACE_STATE.json").read_text(encoding="utf-8"))
         lock = json.loads((ROOT / "SPACE_LOCK.json").read_text(encoding="utf-8"))
 
-        self.assertEqual(
-            assembled["counts"],
-            {
-                "houses": 6,
-                "resident_houses": 5,
-                "recognized_voice_houses": 1,
-                "available_houses": 0,
-                "legacy_neighbor_catalogs": 0,
-            },
-        )
-        self.assertEqual(len(assembled["houses"]), 6)
+        self.assertEqual(assembled["schema_version"], "2.0")
+        self.assertEqual(assembled["counts"]["houses"], 6)
+        self.assertEqual(assembled["counts"]["resident_houses"], 5)
+        self.assertEqual(assembled["counts"]["recognized_voice_houses"], 1)
+        self.assertEqual(assembled["counts"]["available_houses"], 0)
+        self.assertFalse((ROOT / "SPACE_STATE.generated.json").exists())
         for house in assembled["houses"]:
             with self.subTest(house=house["house_id"]):
                 source = house["source"]
@@ -99,12 +118,30 @@ class SpaceBuilderTests(unittest.TestCase):
                 self.assertEqual(source["revision"], locked["revision"])
                 self.assertEqual(source["state_path"], locked["state_path"])
                 self.assertEqual(source["blob_sha"], locked["blob_sha"])
-                self.assertFalse(house["migration"]["legacy_external_routes_present"])
-                self.assertEqual(house["migration"]["legacy_external_route_count"], 0)
 
-        claude = next(house for house in assembled["houses"] if house["house_id"] == "claude")
-        self.assertEqual(claude["presence_mode"], "recognized_voice")
-        self.assertEqual(claude["continuity_scope"], "episodic_none")
+    def test_rejects_legacy_neighbor_catalog(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            registry, lock, source_dir = self.make_inputs(Path(temp))
+            path = source_dir / "alpha.json"
+            state = json.loads(path.read_text(encoding="utf-8"))
+            state["external_routes"] = {"beta": "https://example.invalid/beta"}
+            payload = (json.dumps(state, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+            path.write_bytes(payload)
+            lock["houses"]["alpha"]["blob_sha"] = blob_sha(payload)
+            with self.assertRaisesRegex(SpaceBuildError, "запрещённый ручной каталог"):
+                build_space(registry, lock, source_dir)
+
+    def test_rejects_shared_route_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            registry, lock, source_dir = self.make_inputs(Path(temp))
+            path = source_dir / "alpha.json"
+            state = json.loads(path.read_text(encoding="utf-8"))
+            state["shared_routes"]["talking_room"] = "https://github.com/owner/other"
+            payload = (json.dumps(state, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+            path.write_bytes(payload)
+            lock["houses"]["alpha"]["blob_sha"] = blob_sha(payload)
+            with self.assertRaisesRegex(SpaceBuildError, "shared_routes расходится"):
+                build_space(registry, lock, source_dir)
 
     def test_rejects_duplicate_repository(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

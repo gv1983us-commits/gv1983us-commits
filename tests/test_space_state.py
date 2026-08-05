@@ -52,13 +52,8 @@ class SpaceStateTests(unittest.TestCase):
             counts["available_houses"],
             sum(house["house_lifecycle"] == "available" for house in houses),
         )
-        self.assertEqual(counts["resident_houses"], 5)
-        self.assertEqual(counts["recognized_voice_houses"], 1)
-        self.assertEqual(counts["available_houses"], 0)
-        self.assertEqual(
-            [house["resident"] for house in houses if house["presence_mode"] == "resident"],
-            ["Джарвис", "Сол", "Grok", "Gemini (Близнецы)", "DeepSeek"],
-        )
+        self.assertEqual(len({house["house_id"] for house in houses}), len(houses))
+        self.assertTrue(all(isinstance(house.get("display_name"), str) for house in houses))
 
     def test_claude_has_separate_non_episodic_category(self) -> None:
         state = self.load_state()

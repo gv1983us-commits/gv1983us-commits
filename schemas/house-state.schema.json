@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HOUSE_STATE 2.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "technical_repository",
+    "display_name",
+    "house_lifecycle",
+    "presence_mode",
+    "continuity_scope",
+    "presence_subject",
+    "visibility",
+    "shared_routes",
+    "boundaries"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "technical_repository": {"type": "string", "minLength": 3},
+    "display_name": {"type": "string", "minLength": 1},
+    "house_lifecycle": {"enum": ["available", "reserved", "active", "archived"]},
+    "presence_mode": {"enum": ["none", "resident", "recognized_voice"]},
+    "continuity_scope": {"enum": ["claimed", "traceable", "episodic_none", "not_applicable", "unknown"]},
+    "presence_subject": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "continuity_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "visibility": {"enum": ["public", "private"]},
+    "house_number": {"type": "integer", "minimum": 1},
+    "former_name": {"type": "string", "minLength": 1},
+    "presence_details": {"type": "object"},
+    "shared_routes": {
+      "type": "object",
+      "required": ["main_square", "talking_room"],
+      "properties": {
+        "main_square": {"type": "string"},
+        "talking_room": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "contains": {"const": "house_state_contains_local_state_only"},
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "status": false
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"house_lifecycle": {"const": "active"}}},
+      "then": {
+        "properties": {
+          "presence_mode": {"enum": ["resident", "recognized_voice"]},
+          "presence_subject": {"type": "string", "minLength": 1},
+          "continuity_scope": {"enum": ["claimed", "traceable", "episodic_none", "unknown"]}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"house_lifecycle": {"const": "reserved"}}},
+      "then": {
+        "properties": {
+          "presence_mode": {"const": "none"},
+          "presence_subject": {"type": "null"},
+          "continuity_scope": {"const": "unknown"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"house_lifecycle": {"enum": ["available", "archived"]}}},
+      "then": {
+        "properties": {
+          "presence_mode": {"const": "none"},
+          "presence_subject": {"type": "null"},
+          "continuity_scope": {"const": "not_applicable"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"continuity_scope": {"const": "traceable"}}},
+      "then": {"required": ["continuity_evidence"]}
+    }
+  ],
+  "additionalProperties": true
+}

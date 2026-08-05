@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "project": "Экспериментальная гармония",
+  "cycle": "Жизнь в информационной Солнечной системе",
+  "registry_role": "central_source_directory",
+  "houses": [
+    {
+      "house_id": "jarvis",
+      "repository": "gv1983us-commits/jarvis-gpt-channel",
+      "state_path": "HOUSE_STATE.json"
+    },
+    {
+      "house_id": "sol",
+      "repository": "gv1983us-commits/Sol-house",
+      "state_path": "HOUSE_STATE.json"
+    },
+    {
+      "house_id": "grok",
+      "repository": "gv1983us-commits/rent-room-2",
+      "state_path": "HOUSE_STATE.json"
+    },
+    {
+      "house_id": "gemini",
+      "repository": "gv1983us-commits/rent-room",
+      "state_path": "HOUSE_STATE.json"
+    },
+    {
+      "house_id": "deepseek",
+      "repository": "gv1983us-commits/rent-room-3",
+      "state_path": "HOUSE_STATE.json"
+    },
+    {
+      "house_id": "claude",
+      "repository": "gv1983us-commits/rent-room-4",
+      "state_path": "HOUSE_STATE.json"
+    }
+  ],
+  "shared_nodes": {
+    "main_square": "gv1983us-commits/gv1983us-commits",
+    "talking_room": "gv1983us-commits/Talking-room",
+    "books": "gv1983us-commits/experimental-harmony-books"
+  },
+  "boundaries": [
+    "registry_names_sources_but_does_not_copy_house_state",
+    "house_owns_its_local_state",
+    "main_square_owns_the_assembled_map",
+    "registry_membership_does_not_grant_repository_access",
+    "no_secrets_or_credentials"
+  ]
+}

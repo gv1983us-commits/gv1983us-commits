@@ -16,9 +16,9 @@
       "display_name": "Дом Джарвиса",
       "repository": "gv1983us-commits/jarvis-gpt-channel",
       "source": {
-        "revision": "e7b2e39711862744fcdbe207cd2c82ea42abfc8f",
+        "revision": "9b73a1c904224ba892c01c474fafb762bb58c2b2",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "901b504c39792f83d6b5ee0b549a443879b4bb35",
+        "blob_sha": "f394a9c1fa12be11fdf97f600ec8ccb71286d5a7",
         "source_schema_version": "1.3"
       },
       "house_lifecycle": "active",

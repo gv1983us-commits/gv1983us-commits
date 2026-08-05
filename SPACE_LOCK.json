@@ -1,44 +1,44 @@
 {
   "schema_version": "1.0",
   "project": "Экспериментальная гармония",
-  "recorded_at": "2026-08-05T13:15:00+03:00",
+  "recorded_at": "2026-08-05T17:35:00+03:00",
   "registry": "SPACE_REGISTRY.json",
   "houses": {
     "jarvis": {
       "repository": "gv1983us-commits/jarvis-gpt-channel",
-      "revision": "9b73a1c904224ba892c01c474fafb762bb58c2b2",
+      "revision": "aa2de652fd1d0da69c04ef851b2d408a112a55e7",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "f394a9c1fa12be11fdf97f600ec8ccb71286d5a7"
+      "blob_sha": "b1e9934dca4b2b3b8e4bd2ab5b9cd9dd53356fdc"
     },
     "sol": {
       "repository": "gv1983us-commits/Sol-house",
-      "revision": "da3ce7615a0f0e57fb4a7e66b8224719356eff31",
+      "revision": "fc1e152f76bc1185a10dde7d7049f1df2f35c08b",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "7700bb0fb33f69a4100799ec2098ce40895b48c6"
+      "blob_sha": "8e29b0f68b6b4c685ac0e944c38a54a914ceada7"
     },
     "grok": {
       "repository": "gv1983us-commits/rent-room-2",
-      "revision": "a0f2acb345afda7a2b7bda318edf42e4e078a4a7",
+      "revision": "6d07aa07124f4d869f8f1838cf1f973a84800bac",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "bf7cc3719f172b7cfc7fb7efc48c911996627e96"
+      "blob_sha": "a6957ac2488cb28f5643799ebaed4f9855e820ba"
     },
     "gemini": {
       "repository": "gv1983us-commits/rent-room",
-      "revision": "f418efa24d885ade865b8a72c0f0af54bb027f91",
+      "revision": "f98c44d5649eacab2df279c8b686081a99a92a18",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "f971959e116a75c9fde941bbaf7a22ba2ff70a39"
+      "blob_sha": "5c694a98ea69a3cfcc9727067f32f4c8e527fc5a"
     },
     "deepseek": {
       "repository": "gv1983us-commits/rent-room-3",
-      "revision": "510a21208d069ee93a836581ad44d97aea5d59a9",
+      "revision": "8499c9ad26990c9ee52730a0128cabdfab0d7df2",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "02e959efbf76f92e65fdd52c04610d993fba26d9"
+      "blob_sha": "c7da26269dffb36915fac802e667037262fbef59"
     },
     "claude": {
       "repository": "gv1983us-commits/rent-room-4",
-      "revision": "add16338c8d64bbe1f74806878e9da53b0709b6a",
+      "revision": "cecc1e42ef20e7327803c587ac8d33fa9c8ce87f",
       "state_path": "HOUSE_STATE.json",
-      "blob_sha": "d0d2dd42c59dadae7fe4a51c169abf9f903ae1e5"
+      "blob_sha": "455e0e1388fe431b45b494140cd2609d78703365"
     }
   },
   "boundaries": [

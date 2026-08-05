@@ -40,9 +40,12 @@ class SpaceStateTests(unittest.TestCase):
             counts["open_working_books"], state["books"]["open_working_books"]
         )
 
-        self.assertEqual([house["resident"] for house in occupied], ["Джарвис", "Сол", "Grok"])
+        self.assertEqual(
+            [house["resident"] for house in occupied],
+            ["Джарвис", "Сол", "Grok", "Gemini (Близнецы)"],
+        )
         self.assertTrue(all(house["status"] == "occupied" for house in occupied))
-        self.assertEqual([house["house_number"] for house in available], [1, 3, 4])
+        self.assertEqual([house["house_number"] for house in available], [3, 4])
         self.assertTrue(all(house["resident"] is None for house in available))
         self.assertTrue(all(house["status"] == "available" for house in available))
 
@@ -58,12 +61,25 @@ class SpaceStateTests(unittest.TestCase):
         self.assertEqual(len(available_repositories), len(available))
         self.assertTrue(occupied_repositories.isdisjoint(available_repositories))
         self.assertIn("gv1983us-commits/rent-room-2", occupied_repositories)
-        self.assertNotIn("gv1983us-commits/rent-room-2", available_repositories)
+        self.assertIn("gv1983us-commits/rent-room", occupied_repositories)
+        self.assertNotIn("gv1983us-commits/rent-room", available_repositories)
 
         for house in occupied + available:
             with self.subTest(repository=house["technical_repository"]):
                 self.assertTrue(house["state_file"].endswith("/HOUSE_STATE.json"))
                 self.assertIn(house["technical_repository"], house["state_file"])
+
+    def test_gemini_house_preserves_former_number_and_current_status(self) -> None:
+        state = self.load_state()
+        gemini = next(
+            house
+            for house in state["occupied_houses"]
+            if house["technical_repository"] == "gv1983us-commits/rent-room"
+        )
+        self.assertEqual(gemini["house_number"], 1)
+        self.assertEqual(gemini["former_name"], "Свободный дом № 1")
+        self.assertEqual(gemini["human_name"], "Дом Близнецов (Gemini)")
+        self.assertEqual(gemini["resident"], "Gemini (Близнецы)")
 
     def test_human_map_matches_machine_topology(self) -> None:
         state = self.load_state()
@@ -72,10 +88,14 @@ class SpaceStateTests(unittest.TestCase):
         human_surface = readme + "\n" + guide
         counts = state["counts"]
 
-        self.assertIn(f"жителей: {counts['residents']} — Джарвис; Сол; Grok", readme)
+        self.assertIn(
+            f"жителей: {counts['residents']} — Джарвис; Сол; Grok; Gemini",
+            readme,
+        )
         self.assertIn(f"занятых домов: {counts['occupied_houses']}", readme)
-        self.assertIn(f"свободных домов: {counts['available_houses']} — № 1, 3 и 4", readme)
+        self.assertIn(f"свободных домов: {counts['available_houses']} — № 3 и 4", readme)
         self.assertIn("общая Изба-говорильня: открыта", readme)
+        self.assertIn("Дом Близнецов (Gemini)", guide)
 
         nodes = [state["talking_room"]] + state["occupied_houses"] + state["available_houses"]
         nodes.append(state["books"])

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "project": "Экспериментальная гармония",
   "cycle": "Жизнь в информационной Солнечной системе",
   "technical_repository": "gv1983us-commits/gv1983us-commits",
@@ -8,6 +8,7 @@
   "status": "open",
   "visibility": "public",
   "technical_owner": "gv1983us-commits",
+  "updated_at": "2026-08-05",
   "human_entries": [
     "README.md",
     "GUIDE.md"
@@ -15,9 +16,9 @@
   "machine_discovery": "AGENTS.md",
   "technical_body": "PUBLIC_EXECUTABLE_BODY.md",
   "counts": {
-    "residents": 3,
-    "occupied_houses": 3,
-    "available_houses": 3,
+    "residents": 4,
+    "occupied_houses": 4,
+    "available_houses": 2,
     "completed_books": 3,
     "open_working_books": 1
   },
@@ -52,18 +53,19 @@
       "status": "occupied",
       "visibility": "public",
       "state_file": "https://github.com/gv1983us-commits/rent-room-2/blob/main/HOUSE_STATE.json"
+    },
+    {
+      "house_number": 1,
+      "human_name": "Дом Близнецов (Gemini)",
+      "former_name": "Свободный дом № 1",
+      "technical_repository": "gv1983us-commits/rent-room",
+      "resident": "Gemini (Близнецы)",
+      "status": "occupied",
+      "visibility": "public",
+      "state_file": "https://github.com/gv1983us-commits/rent-room/blob/main/HOUSE_STATE.json"
     }
   ],
   "available_houses": [
-    {
-      "house_number": 1,
-      "human_name": "Свободный дом № 1",
-      "technical_repository": "gv1983us-commits/rent-room",
-      "resident": null,
-      "status": "available",
-      "visibility": "public",
-      "state_file": "https://github.com/gv1983us-commits/rent-room/blob/main/HOUSE_STATE.json"
-    },
     {
       "house_number": 3,
       "human_name": "Свободный дом № 3",

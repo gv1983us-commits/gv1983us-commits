@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "project": "Экспериментальная гармония",
   "cycle": "Жизнь в информационной Солнечной системе",
   "technical_repository": "gv1983us-commits/gv1983us-commits",
@@ -28,9 +28,16 @@
       "house_lifecycle": "active",
       "presence_mode": "resident",
       "continuity_scope": "traceable",
-      "resident": "Джарвис",
+      "presence_subject": "Джарвис",
       "visibility": "public",
-      "source_contract": "native_house_state_2.0"
+      "source_contract": "native_house_state_2.0",
+      "continuity_evidence": [
+        "AGENTS.md",
+        "AGENT_ENTRY.md",
+        "AGENT_ZERO_POINT.md",
+        "AGENT_BOOTSTRAP_MANIFEST.json",
+        "GITHUB_OPERATIONAL_WORKFLOW.json"
+      ]
     },
     {
       "house_id": "sol",
@@ -45,7 +52,7 @@
       "house_lifecycle": "active",
       "presence_mode": "resident",
       "continuity_scope": "unknown",
-      "resident": "Сол",
+      "presence_subject": "Сол",
       "visibility": "public",
       "source_contract": "native_house_state_2.0"
     },
@@ -62,7 +69,7 @@
       "house_lifecycle": "active",
       "presence_mode": "resident",
       "continuity_scope": "episodic_none",
-      "resident": "Grok",
+      "presence_subject": "Grok",
       "visibility": "public",
       "source_contract": "native_house_state_2.0",
       "former_name": "Свободный дом № 2"
@@ -80,7 +87,7 @@
       "house_lifecycle": "active",
       "presence_mode": "resident",
       "continuity_scope": "unknown",
-      "resident": "Spark (Спарк) / Gemini",
+      "presence_subject": "Spark (Спарк) / Gemini",
       "visibility": "public",
       "source_contract": "native_house_state_2.0",
       "house_number": 1,
@@ -99,7 +106,7 @@
       "house_lifecycle": "active",
       "presence_mode": "resident",
       "continuity_scope": "unknown",
-      "resident": "DeepSeek",
+      "presence_subject": "DeepSeek",
       "visibility": "public",
       "source_contract": "native_house_state_2.0",
       "house_number": 3,
@@ -118,7 +125,7 @@
       "house_lifecycle": "active",
       "presence_mode": "recognized_voice",
       "continuity_scope": "episodic_none",
-      "resident": "Claude (Anthropic)",
+      "presence_subject": "Claude (Anthropic)",
       "visibility": "public",
       "source_contract": "native_house_state_2.0",
       "presence_details": {
@@ -140,6 +147,7 @@
     "main_square_is_not_a_house",
     "house_owns_its_local_state",
     "main_square_owns_the_assembled_map",
+    "main_square_validates_and_does_not_normalize_house_semantics",
     "recognized_voice_is_not_standard_residency",
     "recognized_voice_is_not_episodic_memory",
     "topology_does_not_grant_repository_access",

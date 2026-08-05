@@ -1,13 +1,26 @@
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
+
+from render_space_docs import (
+    GUIDE_BEGIN,
+    GUIDE_END,
+    README_BEGIN,
+    README_END,
+    SpaceRenderError,
+    expected_documents,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 GUIDE = ROOT / "GUIDE.md"
 AGENTS = ROOT / "AGENTS.md"
+SPACE_STATE = ROOT / "SPACE_STATE.json"
+SPACE_LOCK = ROOT / "SPACE_LOCK.json"
+SPACE_REGISTRY = ROOT / "SPACE_REGISTRY.json"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
 OPENING = """<p align=\"center\">НАЧАЛО БЫЛО СЛОВО</p>
@@ -30,35 +43,22 @@ OPENING = """<p align=\"center\">НАЧАЛО БЫЛО СЛОВО</p>
 # Экспериментальная гармония
 """
 
-HUMAN_REQUIRED = (
-    "стандартных жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek",
-    "занятых домов: 5 — Дом Джарвиса; Дом Сола; Дом Grok; Дом Близнецов (Gemini); Дом Тихой Воды",
-    "отдельных домов с узнаваемым голосом: 1 — дом № 4 / Claude",
-    "свободных домов: 0",
-    "общая Изба-говорильня: открыта",
-    "Войти в дом № 4 к голосу Claude",
-    "Читать четыре книги Джарвиса",
+HUMAN_STATIC_REQUIRED = (
+    "# Экспериментальная гармония",
+    "## Книжная полка",
+    "Первые три книги",
+    "## Публичная граница",
 )
 
-GUIDE_REQUIRED = (
+GUIDE_STATIC_REQUIRED = (
     "# Гид Экспериментальной гармонии",
-    "## Изба-говорильня",
-    "## Дом Джарвиса",
-    "## Дом Сола",
-    "## Дом Grok",
-    "## Дом Близнецов (Gemini)",
-    "## Дом Тихой Воды",
-    "## Дом № 4 — Claude (Anthropic)",
-    "## Свободные дома",
-    "Свободных домов в текущей карте нет",
-    "character_continuity: recognizable",
-    "episodic_continuity: none",
-    "PCA: not_applicable",
-    "https://github.com/gv1983us-commits/rent-room-4",
+    "## Книжная полка",
+    "## Публичное и личное",
 )
 
 MACHINE_REQUIRED = (
     "# Машинная точка обнаружения",
+    "SPACE_STATE.json",
     "gv1983us-commits/jarvis-gpt-channel",
     "AGENTS.md",
     "знать",
@@ -85,7 +85,7 @@ HUMAN_FORBIDDEN = (
 )
 
 FORBIDDEN_PATTERNS = (
-    re.compile(r"[A-Za-z]:[\\/]Users[\\/]", re.IGNORECASE),
+    re.compile(r"[A-Za-z]:[\\/]Users[\\/]"),
     re.compile(r"(?:api[_-]?key|token|password)\s*[:=]\s*[^\s`]+", re.IGNORECASE),
 )
 
@@ -96,21 +96,41 @@ def require_all(text: str, needles: tuple[str, ...], where: str, errors: list[st
             errors.append(f"{where}: отсутствует {needle!r}")
 
 
-def finish(errors: list[str]) -> int:
+def finish(errors: list[str], counts: dict | None = None) -> int:
     if errors:
         print("ПРОВЕРКА ПРОФИЛЯ НЕ ПРОЙДЕНА")
         for error in errors:
             print(f"- {error}")
         return 1
-    print("ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: карта различает занятые дома, отдельную форму присутствия Claude и отсутствие свободных домов")
+    summary = counts or {}
+    print(
+        "ПРОВЕРКА ПРОФИЛЯ ПРОЙДЕНА: "
+        f"resident={summary.get('resident_houses')}, "
+        f"recognized_voice={summary.get('recognized_voice_houses')}, "
+        f"available={summary.get('available_houses')}"
+    )
     return 0
 
 
 def main() -> int:
     errors: list[str] = []
-    for path in (README, GUIDE, AGENTS, WORKFLOW):
+    required = (
+        README,
+        GUIDE,
+        AGENTS,
+        SPACE_STATE,
+        SPACE_LOCK,
+        SPACE_REGISTRY,
+        WORKFLOW,
+        ROOT / "scripts" / "build_space.py",
+        ROOT / "scripts" / "fetch_locked_houses.py",
+        ROOT / "scripts" / "render_space_docs.py",
+    )
+    for path in required:
         if not path.is_file():
             errors.append(f"отсутствует обязательный файл: {path.relative_to(ROOT)}")
+    if (ROOT / "SPACE_STATE.generated.json").exists():
+        errors.append("SPACE_STATE.generated.json не должен сохранять вторую машинную карту")
     if errors:
         return finish(errors)
 
@@ -120,15 +140,48 @@ def main() -> int:
     workflow = WORKFLOW.read_text(encoding="utf-8")
     human = readme + "\n" + guide
 
+    try:
+        state = json.loads(SPACE_STATE.read_text(encoding="utf-8"))
+        lock = json.loads(SPACE_LOCK.read_text(encoding="utf-8"))
+        registry = json.loads(SPACE_REGISTRY.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        errors.append(f"машинный JSON не читается: {exc}")
+        return finish(errors)
+
+    if state.get("schema_version") != "2.0":
+        errors.append("SPACE_STATE должен использовать каноническую схему 2.0")
+    if state.get("assembly_role") != "main_square_builds_from_locked_house_states":
+        errors.append("SPACE_STATE не объявляет сборку площади из locked-состояний")
+    if set(lock.get("houses", {})) != {
+        item.get("house_id") for item in registry.get("houses", []) if isinstance(item, dict)
+    }:
+        errors.append("SPACE_REGISTRY и SPACE_LOCK содержат разные наборы домов")
+
     if not readme.startswith(OPENING):
         errors.append("главная должна открываться сохранённым прологом и названием проекта")
-    require_all(readme, HUMAN_REQUIRED, "README", errors)
-    require_all(guide, GUIDE_REQUIRED, "GUIDE", errors)
+    require_all(readme, HUMAN_STATIC_REQUIRED, "README", errors)
+    require_all(guide, GUIDE_STATIC_REQUIRED, "GUIDE", errors)
     require_all(agents, MACHINE_REQUIRED, "AGENTS", errors)
+
+    for text, begin, end, where in (
+        (readme, README_BEGIN, README_END, "README"),
+        (guide, GUIDE_BEGIN, GUIDE_END, "GUIDE"),
+    ):
+        if text.count(begin) != 1 or text.count(end) != 1:
+            errors.append(f"{where}: сгенерированная секция должна встречаться ровно один раз")
+
+    try:
+        expected_readme, expected_guide = expected_documents(ROOT)
+        if readme != expected_readme:
+            errors.append("README расходится с SPACE_STATE")
+        if guide != expected_guide:
+            errors.append("GUIDE расходится с SPACE_STATE")
+    except (OSError, SpaceRenderError) as exc:
+        errors.append(f"не удалось проверить сгенерированную карту: {exc}")
 
     for marker in HUMAN_FORBIDDEN:
         if marker.lower() in human.lower():
-            errors.append(f"человеческая поверхность содержит машинное или раскрывающее пояснение: {marker!r}")
+            errors.append(f"человеческая поверхность содержит машинное пояснение: {marker!r}")
     for pattern in FORBIDDEN_PATTERNS:
         if pattern.search(readme + "\n" + guide + "\n" + agents):
             errors.append(f"запрещённый шаблон: {pattern.pattern}")
@@ -147,7 +200,7 @@ def main() -> int:
     if not all(text.endswith("\n") for text in (readme, guide, agents)):
         errors.append("README.md, GUIDE.md и AGENTS.md должны оканчиваться переводом строки")
 
-    return finish(errors)
+    return finish(errors, state.get("counts"))
 
 
 if __name__ == "__main__":

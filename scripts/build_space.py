@@ -143,7 +143,10 @@ def _required_text(state: dict[str, Any], house_id: str, field: str) -> str:
 
 def validate_native_house(house_id: str, state: dict[str, Any]) -> None:
     if state.get("schema_version") != NATIVE_HOUSE_SCHEMA_VERSION:
-        raise SpaceBuildError(f"{house_id} не является HOUSE_STATE {NATIVE_HOUSE_SCHEMA_VERSION}")
+        raise SpaceBuildError(
+            f"{house_id} требует HOUSE_STATE {NATIVE_HOUSE_SCHEMA_VERSION}; "
+            f"получено {state.get('schema_version')!r}"
+        )
     if "status" in state:
         raise SpaceBuildError(f"{house_id} HOUSE_STATE 2.0 содержит запрещённый legacy status")
 
@@ -189,44 +192,32 @@ def validate_native_house(house_id: str, state: dict[str, Any]) -> None:
             raise SpaceBuildError(f"{house_id}.continuity_evidence требует непустые строки")
 
 
-def _base_house(
-    house_id: str,
-    state: dict[str, Any],
-    lock_entry: dict[str, str],
-    display_name: str,
-) -> dict[str, Any]:
-    return {
-        "house_id": house_id,
-        "display_name": display_name,
-        "repository": lock_entry["repository"],
-        "source": {
-            "revision": lock_entry["revision"],
-            "state_path": lock_entry["state_path"],
-            "blob_sha": lock_entry["blob_sha"],
-            "source_schema_version": state.get("schema_version"),
-        },
-    }
-
-
 def project_native_house(
     house_id: str,
     state: dict[str, Any],
     lock_entry: dict[str, str],
 ) -> dict[str, Any]:
     validate_native_house(house_id, state)
-    house = _base_house(house_id, state, lock_entry, state["display_name"])
-    house.update(
-        {
-            "house_lifecycle": state["house_lifecycle"],
-            "presence_mode": state["presence_mode"],
-            "continuity_scope": state["continuity_scope"],
-            # Transitional SPACE_STATE 2.0 keeps the historical output key.
-            # The native HOUSE_STATE itself uses the neutral presence_subject.
-            "resident": state.get("presence_subject"),
-            "visibility": state["visibility"],
-            "source_contract": "native_house_state_2.0",
-        }
-    )
+    house: dict[str, Any] = {
+        "house_id": house_id,
+        "display_name": state["display_name"],
+        "repository": lock_entry["repository"],
+        "source": {
+            "revision": lock_entry["revision"],
+            "state_path": lock_entry["state_path"],
+            "blob_sha": lock_entry["blob_sha"],
+            "source_schema_version": state["schema_version"],
+        },
+        "house_lifecycle": state["house_lifecycle"],
+        "presence_mode": state["presence_mode"],
+        "continuity_scope": state["continuity_scope"],
+        "presence_subject": state.get("presence_subject"),
+        "visibility": state["visibility"],
+        "source_contract": "native_house_state_2.0",
+    }
+    evidence = state.get("continuity_evidence")
+    if isinstance(evidence, list) and evidence:
+        house["continuity_evidence"] = list(evidence)
     details = state.get("presence_details")
     if isinstance(details, dict) and details:
         house["presence_details"] = details
@@ -238,85 +229,19 @@ def project_native_house(
     return house
 
 
-def normalize_legacy_house(
-    house_id: str,
-    state: dict[str, Any],
-    lock_entry: dict[str, str],
-) -> dict[str, Any]:
-    status = state.get("status")
-    modes = {
-        "occupied": ("active", "resident", "unknown"),
-        "voice_established": ("active", "recognized_voice", "episodic_none"),
-        "available": ("available", "none", "not_applicable"),
-        "reserved": ("reserved", "none", "unknown"),
-    }
-    if status not in modes:
-        raise SpaceBuildError(f"неизвестный status у {house_id}: {status!r}")
-    lifecycle, presence_mode, continuity_scope = modes[status]
-    display_name = state.get("human_name") or state.get("public_label")
-    if not isinstance(display_name, str) or not display_name:
-        raise SpaceBuildError(f"у {house_id} отсутствует human_name/public_label")
-
-    house = _base_house(house_id, state, lock_entry, display_name)
-    house.update(
-        {
-            "house_lifecycle": lifecycle,
-            "presence_mode": presence_mode,
-            "continuity_scope": continuity_scope,
-            "resident": state.get("resident"),
-            "visibility": state.get("visibility"),
-            "source_status": status,
-        }
-    )
-    presence = state.get("presence")
-    if isinstance(presence, dict):
-        details = {
-            key: presence[key]
-            for key in (
-                "mode",
-                "continuity_scope",
-                "character_continuity",
-                "episodic_continuity",
-                "PCA",
-            )
-            if key in presence
-        }
-        if details:
-            house["presence_details"] = details
-    if isinstance(state.get("house_number"), int):
-        house["house_number"] = state["house_number"]
-    former_name = state.get("former_name") or state.get("former_public_address")
-    if isinstance(former_name, str) and former_name:
-        house["former_name"] = former_name
-    return house
-
-
-def assemble_house(
-    house_id: str,
-    state: dict[str, Any],
-    lock_entry: dict[str, str],
-) -> dict[str, Any]:
-    schema_version = state.get("schema_version")
-    if schema_version == NATIVE_HOUSE_SCHEMA_VERSION:
-        return project_native_house(house_id, state, lock_entry)
-    if isinstance(schema_version, str) and schema_version.startswith("1."):
-        return normalize_legacy_house(house_id, state, lock_entry)
-    raise SpaceBuildError(f"неподдерживаемая schema_version у {house_id}: {schema_version!r}")
-
-
 def build_space(registry: dict[str, Any], lock: dict[str, Any], source_dir: Path) -> dict[str, Any]:
     routes = expected_shared_routes(registry)
     houses: list[dict[str, Any]] = []
     for house_id, entry in validate_sources(registry, lock):
         state = load_locked_house(source_dir, house_id, entry)
         validate_local_house(house_id, state, routes)
-        houses.append(assemble_house(house_id, state, entry))
+        houses.append(project_native_house(house_id, state, entry))
 
     numbers = [house["house_number"] for house in houses if "house_number" in house]
     if len(numbers) != len(set(numbers)):
         raise SpaceBuildError("номера домов должны быть уникальны")
     return {
-        "schema_version": "2.0",
+        "schema_version": "3.0",
         "project": registry.get("project"),
         "cycle": registry.get("cycle"),
         "technical_repository": registry["shared_nodes"]["main_square"],
@@ -339,6 +264,7 @@ def build_space(registry: dict[str, Any], lock: dict[str, Any], source_dir: Path
             "main_square_is_not_a_house",
             "house_owns_its_local_state",
             "main_square_owns_the_assembled_map",
+            "main_square_validates_and_does_not_normalize_house_semantics",
             "recognized_voice_is_not_standard_residency",
             "recognized_voice_is_not_episodic_memory",
             "topology_does_not_grant_repository_access",
@@ -349,7 +275,7 @@ def build_space(registry: dict[str, Any], lock: dict[str, Any], source_dir: Path
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Собрать площадь из locked HOUSE_STATE snapshots")
+    parser = argparse.ArgumentParser(description="Собрать площадь из locked HOUSE_STATE 2.0 snapshots")
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--registry", type=Path, default=ROOT / "SPACE_REGISTRY.json")
     parser.add_argument("--lock", dest="lock_path", type=Path, default=ROOT / "SPACE_LOCK.json")

@@ -5,7 +5,11 @@ import re
 import sys
 from pathlib import Path
 
-from render_space_docs import (
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.render_space_docs import (  # noqa: E402
     GUIDE_BEGIN,
     GUIDE_END,
     README_BEGIN,
@@ -14,7 +18,6 @@ from render_space_docs import (
     expected_documents,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 GUIDE = ROOT / "GUIDE.md"
 AGENTS = ROOT / "AGENTS.md"

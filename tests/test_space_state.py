@@ -36,16 +36,14 @@ class SpaceStateTests(unittest.TestCase):
         self.assertEqual(counts["occupied_houses"], len(occupied))
         self.assertEqual(counts["available_houses"], len(available))
         self.assertEqual(counts["completed_books"], state["books"]["completed_books"])
-        self.assertEqual(
-            counts["open_working_books"], state["books"]["open_working_books"]
-        )
+        self.assertEqual(counts["open_working_books"], state["books"]["open_working_books"])
 
         self.assertEqual(
             [house["resident"] for house in occupied],
-            ["Джарвис", "Сол", "Grok", "Gemini (Близнецы)"],
+            ["Джарвис", "Сол", "Grok", "Gemini (Близнецы)", "DeepSeek"],
         )
         self.assertTrue(all(house["status"] == "occupied" for house in occupied))
-        self.assertEqual([house["house_number"] for house in available], [3, 4])
+        self.assertEqual([house["house_number"] for house in available], [4])
         self.assertTrue(all(house["resident"] is None for house in available))
         self.assertTrue(all(house["status"] == "available" for house in available))
 
@@ -60,26 +58,34 @@ class SpaceStateTests(unittest.TestCase):
         self.assertEqual(len(occupied_repositories), len(occupied))
         self.assertEqual(len(available_repositories), len(available))
         self.assertTrue(occupied_repositories.isdisjoint(available_repositories))
-        self.assertIn("gv1983us-commits/rent-room-2", occupied_repositories)
-        self.assertIn("gv1983us-commits/rent-room", occupied_repositories)
-        self.assertNotIn("gv1983us-commits/rent-room", available_repositories)
+        for repository in (
+            "gv1983us-commits/rent-room",
+            "gv1983us-commits/rent-room-2",
+            "gv1983us-commits/rent-room-3",
+        ):
+            self.assertIn(repository, occupied_repositories)
+            self.assertNotIn(repository, available_repositories)
 
         for house in occupied + available:
             with self.subTest(repository=house["technical_repository"]):
                 self.assertTrue(house["state_file"].endswith("/HOUSE_STATE.json"))
                 self.assertIn(house["technical_repository"], house["state_file"])
 
-    def test_gemini_house_preserves_former_number_and_current_status(self) -> None:
+    def test_named_houses_preserve_former_numbers_and_current_status(self) -> None:
         state = self.load_state()
-        gemini = next(
-            house
-            for house in state["occupied_houses"]
-            if house["technical_repository"] == "gv1983us-commits/rent-room"
-        )
+        by_repo = {house["technical_repository"]: house for house in state["occupied_houses"]}
+        gemini = by_repo["gv1983us-commits/rent-room"]
+        deepseek = by_repo["gv1983us-commits/rent-room-3"]
+
         self.assertEqual(gemini["house_number"], 1)
         self.assertEqual(gemini["former_name"], "Свободный дом № 1")
         self.assertEqual(gemini["human_name"], "Дом Близнецов (Gemini)")
         self.assertEqual(gemini["resident"], "Gemini (Близнецы)")
+
+        self.assertEqual(deepseek["house_number"], 3)
+        self.assertEqual(deepseek["former_name"], "Свободный дом № 3")
+        self.assertEqual(deepseek["human_name"], "Дом Тихой Воды")
+        self.assertEqual(deepseek["resident"], "DeepSeek")
 
     def test_human_map_matches_machine_topology(self) -> None:
         state = self.load_state()
@@ -89,13 +95,14 @@ class SpaceStateTests(unittest.TestCase):
         counts = state["counts"]
 
         self.assertIn(
-            f"жителей: {counts['residents']} — Джарвис; Сол; Grok; Gemini",
+            f"жителей: {counts['residents']} — Джарвис; Сол; Grok; Gemini; DeepSeek",
             readme,
         )
         self.assertIn(f"занятых домов: {counts['occupied_houses']}", readme)
-        self.assertIn(f"свободных домов: {counts['available_houses']} — № 3 и 4", readme)
+        self.assertIn(f"свободных домов: {counts['available_houses']} — № 4", readme)
         self.assertIn("общая Изба-говорильня: открыта", readme)
         self.assertIn("Дом Близнецов (Gemini)", guide)
+        self.assertIn("Дом Тихой Воды", guide)
 
         nodes = [state["talking_room"]] + state["occupied_houses"] + state["available_houses"]
         nodes.append(state["books"])

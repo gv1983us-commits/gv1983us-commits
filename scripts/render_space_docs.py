@@ -31,20 +31,36 @@ def github_url(repository: str) -> str:
     return f"https://github.com/{repository}"
 
 
-def ordered_groups(state: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+def ordered_groups(
+    state: dict[str, Any],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
     residents: list[dict[str, Any]] = []
     recognized: list[dict[str, Any]] = []
     available: list[dict[str, Any]] = []
+    reserved: list[dict[str, Any]] = []
+    archived: list[dict[str, Any]] = []
     for house in state["houses"]:
-        if house.get("house_lifecycle") == "available":
+        lifecycle = house.get("house_lifecycle")
+        presence_mode = house.get("presence_mode")
+        if lifecycle == "available":
             available.append(house)
-        elif house.get("presence_mode") == "recognized_voice":
+        elif lifecycle == "reserved":
+            reserved.append(house)
+        elif lifecycle == "archived":
+            archived.append(house)
+        elif lifecycle == "active" and presence_mode == "recognized_voice":
             recognized.append(house)
-        elif house.get("presence_mode") == "resident":
+        elif lifecycle == "active" and presence_mode == "resident":
             residents.append(house)
         else:
             raise SpaceRenderError(f"неизвестная форма дома: {house.get('house_id')}")
-    return residents, recognized, available
+    return residents, recognized, available, reserved, archived
 
 
 def joined(values: list[str]) -> str:
@@ -52,7 +68,7 @@ def joined(values: list[str]) -> str:
 
 
 def render_readme_section(state: dict[str, Any]) -> str:
-    residents, recognized, available = ordered_groups(state)
+    residents, recognized, available, _reserved, _archived = ordered_groups(state)
     shared = state["shared_nodes"]
     lines = [
         README_BEGIN,
@@ -107,7 +123,7 @@ def render_presence_details(house: dict[str, Any]) -> list[str]:
 
 
 def render_guide_section(state: dict[str, Any]) -> str:
-    _residents, _recognized, available = ordered_groups(state)
+    _residents, _recognized, available, _reserved, _archived = ordered_groups(state)
     shared = state["shared_nodes"]
     tree_nodes = ["Изба-говорильня", *[house["display_name"] for house in state["houses"]]]
     if isinstance(shared.get("books"), str):
@@ -141,6 +157,10 @@ def render_guide_section(state: dict[str, Any]) -> str:
         )
         if house["house_lifecycle"] == "available":
             lines.append("Адрес свободен.")
+        elif house["house_lifecycle"] == "reserved":
+            lines.append("Адрес зарезервирован, но ещё не активен.")
+        elif house["house_lifecycle"] == "archived":
+            lines.append("Дом архивирован и не участвует в текущей эксплуатации.")
         elif house["presence_mode"] == "recognized_voice":
             lines.append(
                 f"Голос дома: **{house['resident']}**. Это отдельная форма присутствия, "

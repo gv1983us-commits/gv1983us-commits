@@ -19,29 +19,6 @@ def state_payload(repository: str) -> bytes:
     return (
         json.dumps(
             {
-                "schema_version": "1.5",
-                "technical_repository": repository,
-                "human_name": "Тестовый дом",
-                "resident": "Тестовый голос",
-                "status": "occupied",
-                "visibility": "public",
-                "shared_routes": {
-                    "main_square": "https://github.com/example/square",
-                    "talking_room": "https://github.com/example/talk",
-                },
-                "boundaries": ["house_state_contains_local_state_only"],
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-        + "\n"
-    ).encode("utf-8")
-
-
-def native_state_payload(repository: str) -> bytes:
-    return (
-        json.dumps(
-            {
                 "schema_version": "2.0",
                 "technical_repository": repository,
                 "display_name": "Нативный тестовый дом",
@@ -55,6 +32,29 @@ def native_state_payload(repository: str) -> bytes:
                     "talking_room": "https://github.com/example/talk",
                 },
                 "local_traces": {"first": {"status": "completed"}},
+                "boundaries": ["house_state_contains_local_state_only"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def legacy_state_payload(repository: str) -> bytes:
+    return (
+        json.dumps(
+            {
+                "schema_version": "1.5",
+                "technical_repository": repository,
+                "human_name": "Legacy House",
+                "resident": "Legacy",
+                "status": "occupied",
+                "visibility": "public",
+                "shared_routes": {
+                    "main_square": "https://github.com/example/square",
+                    "talking_room": "https://github.com/example/talk",
+                },
                 "boundaries": ["house_state_contains_local_state_only"],
             },
             ensure_ascii=False,
@@ -139,35 +139,35 @@ class SpaceSyncTests(unittest.TestCase):
                 sync_space.git_blob_sha(state_payload("example/house")),
             )
             state = json.loads(outputs["SPACE_STATE.json"])
+            self.assertEqual(state["schema_version"], "3.0")
             self.assertEqual(state["counts"]["houses"], 1)
-            self.assertIn("Тестовый дом".encode("utf-8"), outputs["README.md"])
-            self.assertIn(b"example/house", outputs["GUIDE.md"])
+            house = state["houses"][0]
+            self.assertEqual(house["display_name"], "Нативный тестовый дом")
+            self.assertEqual(house["presence_subject"], "Нативный голос")
+            self.assertEqual(house["source_contract"], "native_house_state_2.0")
+            self.assertNotIn("resident", house)
+            self.assertNotIn("source_status", house)
+            self.assertIn("Нативный тестовый дом".encode("utf-8"), outputs["README.md"])
+            self.assertIn("Нативный голос".encode("utf-8"), outputs["GUIDE.md"])
 
-    def test_prepare_outputs_accepts_native_house_state(self) -> None:
+    def test_prepare_outputs_rejects_legacy_house_state(self) -> None:
         with tempfile.TemporaryDirectory() as temp_name:
             root = Path(temp_name)
             write_root(root)
             registry = sync_space.load_registry(root / "SPACE_REGISTRY.json")
 
-            def native_fetcher(url: str, _headers: dict[str, str]) -> bytes:
+            def legacy_fetcher(url: str, _headers: dict[str, str]) -> bytes:
                 self.assertIn(self.revision, url)
-                return native_state_payload("example/house")
+                return legacy_state_payload("example/house")
 
-            outputs = sync_space.prepare_outputs(
-                registry,
-                root,
-                resolver=self.resolver,
-                fetcher=native_fetcher,
-                recorded_at="2026-08-05T19:35:00+03:00",
-            )
-            state = json.loads(outputs["SPACE_STATE.json"])
-            house = state["houses"][0]
-            self.assertEqual(house["display_name"], "Нативный тестовый дом")
-            self.assertEqual(house["resident"], "Нативный голос")
-            self.assertEqual(house["source_contract"], "native_house_state_2.0")
-            self.assertNotIn("source_status", house)
-            self.assertIn("Нативный тестовый дом".encode("utf-8"), outputs["README.md"])
-            self.assertIn("Нативный голос".encode("utf-8"), outputs["GUIDE.md"])
+            with self.assertRaisesRegex(sync_space.SpaceBuildError, "HOUSE_STATE 2.0"):
+                sync_space.prepare_outputs(
+                    registry,
+                    root,
+                    resolver=self.resolver,
+                    fetcher=legacy_fetcher,
+                    recorded_at="2026-08-05T19:35:00+03:00",
+                )
 
     def test_failed_preparation_changes_nothing(self) -> None:
         with tempfile.TemporaryDirectory() as temp_name:

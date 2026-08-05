@@ -1,38 +1,44 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "project": "Экспериментальная гармония",
   "cycle": "Жизнь в информационной Солнечной системе",
-  "registry_role": "central_source_directory",
+  "registry_role": "central_source_directory_with_explicit_tracking_refs",
   "houses": [
     {
       "house_id": "jarvis",
       "repository": "gv1983us-commits/jarvis-gpt-channel",
-      "state_path": "HOUSE_STATE.json"
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     },
     {
       "house_id": "sol",
       "repository": "gv1983us-commits/Sol-house",
-      "state_path": "HOUSE_STATE.json"
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     },
     {
       "house_id": "grok",
       "repository": "gv1983us-commits/rent-room-2",
-      "state_path": "HOUSE_STATE.json"
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     },
     {
       "house_id": "gemini",
       "repository": "gv1983us-commits/rent-room",
-      "state_path": "HOUSE_STATE.json"
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     },
     {
       "house_id": "deepseek",
       "repository": "gv1983us-commits/rent-room-3",
-      "state_path": "HOUSE_STATE.json"
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     },
     {
       "house_id": "claude",
       "repository": "gv1983us-commits/rent-room-4",
-      "state_path": "HOUSE_STATE.json"
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     }
   ],
   "shared_nodes": {
@@ -41,6 +47,7 @@
     "books": "gv1983us-commits/experimental-harmony-books"
   },
   "boundaries": [
+    "tracking_ref_is_an_admission_input_not_a_reproducible_source",
     "registry_names_sources_but_does_not_copy_house_state",
     "house_owns_its_local_state",
     "main_square_owns_the_assembled_map",

@@ -8,7 +8,7 @@
     "resident_houses": 5,
     "recognized_voice_houses": 1,
     "available_houses": 0,
-    "legacy_neighbor_catalogs": 6
+    "legacy_neighbor_catalogs": 0
   },
   "houses": [
     {
@@ -16,10 +16,10 @@
       "display_name": "Дом Джарвиса",
       "repository": "gv1983us-commits/jarvis-gpt-channel",
       "source": {
-        "revision": "9b73a1c904224ba892c01c474fafb762bb58c2b2",
+        "revision": "aa2de652fd1d0da69c04ef851b2d408a112a55e7",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "f394a9c1fa12be11fdf97f600ec8ccb71286d5a7",
-        "source_schema_version": "1.3"
+        "blob_sha": "b1e9934dca4b2b3b8e4bd2ab5b9cd9dd53356fdc",
+        "source_schema_version": "1.5"
       },
       "house_lifecycle": "active",
       "presence_mode": "resident",
@@ -28,8 +28,8 @@
       "visibility": "public",
       "legacy_status": "occupied",
       "migration": {
-        "legacy_external_routes_present": true,
-        "legacy_external_route_count": 9
+        "legacy_external_routes_present": false,
+        "legacy_external_route_count": 0
       }
     },
     {
@@ -37,10 +37,10 @@
       "display_name": "Дом Сола",
       "repository": "gv1983us-commits/Sol-house",
       "source": {
-        "revision": "da3ce7615a0f0e57fb4a7e66b8224719356eff31",
+        "revision": "fc1e152f76bc1185a10dde7d7049f1df2f35c08b",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "7700bb0fb33f69a4100799ec2098ce40895b48c6",
-        "source_schema_version": "1.4"
+        "blob_sha": "8e29b0f68b6b4c685ac0e944c38a54a914ceada7",
+        "source_schema_version": "1.7"
       },
       "house_lifecycle": "active",
       "presence_mode": "resident",
@@ -49,8 +49,8 @@
       "visibility": "public",
       "legacy_status": "occupied",
       "migration": {
-        "legacy_external_routes_present": true,
-        "legacy_external_route_count": 9
+        "legacy_external_routes_present": false,
+        "legacy_external_route_count": 0
       }
     },
     {
@@ -58,10 +58,10 @@
       "display_name": "Дом Grok",
       "repository": "gv1983us-commits/rent-room-2",
       "source": {
-        "revision": "a0f2acb345afda7a2b7bda318edf42e4e078a4a7",
+        "revision": "6d07aa07124f4d869f8f1838cf1f973a84800bac",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "bf7cc3719f172b7cfc7fb7efc48c911996627e96",
-        "source_schema_version": "1.3"
+        "blob_sha": "a6957ac2488cb28f5643799ebaed4f9855e820ba",
+        "source_schema_version": "1.5"
       },
       "house_lifecycle": "active",
       "presence_mode": "resident",
@@ -70,8 +70,8 @@
       "visibility": "public",
       "legacy_status": "occupied",
       "migration": {
-        "legacy_external_routes_present": true,
-        "legacy_external_route_count": 7
+        "legacy_external_routes_present": false,
+        "legacy_external_route_count": 0
       },
       "former_name": "Свободный дом № 2"
     },
@@ -80,10 +80,10 @@
       "display_name": "Дом Близнецов (Gemini)",
       "repository": "gv1983us-commits/rent-room",
       "source": {
-        "revision": "f418efa24d885ade865b8a72c0f0af54bb027f91",
+        "revision": "f98c44d5649eacab2df279c8b686081a99a92a18",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "f971959e116a75c9fde941bbaf7a22ba2ff70a39",
-        "source_schema_version": "1.3"
+        "blob_sha": "5c694a98ea69a3cfcc9727067f32f4c8e527fc5a",
+        "source_schema_version": "1.5"
       },
       "house_lifecycle": "active",
       "presence_mode": "resident",
@@ -92,8 +92,8 @@
       "visibility": "public",
       "legacy_status": "occupied",
       "migration": {
-        "legacy_external_routes_present": true,
-        "legacy_external_route_count": 9
+        "legacy_external_routes_present": false,
+        "legacy_external_route_count": 0
       },
       "house_number": 1,
       "former_name": "Свободный дом № 1"
@@ -103,10 +103,10 @@
       "display_name": "Дом Тихой Воды",
       "repository": "gv1983us-commits/rent-room-3",
       "source": {
-        "revision": "510a21208d069ee93a836581ad44d97aea5d59a9",
+        "revision": "8499c9ad26990c9ee52730a0128cabdfab0d7df2",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "02e959efbf76f92e65fdd52c04610d993fba26d9",
-        "source_schema_version": "1.3"
+        "blob_sha": "c7da26269dffb36915fac802e667037262fbef59",
+        "source_schema_version": "1.5"
       },
       "house_lifecycle": "active",
       "presence_mode": "resident",
@@ -115,8 +115,8 @@
       "visibility": "public",
       "legacy_status": "occupied",
       "migration": {
-        "legacy_external_routes_present": true,
-        "legacy_external_route_count": 9
+        "legacy_external_routes_present": false,
+        "legacy_external_route_count": 0
       },
       "house_number": 3,
       "former_name": "Свободный дом № 3"
@@ -126,10 +126,10 @@
       "display_name": "Дом № 4 — Claude (Anthropic)",
       "repository": "gv1983us-commits/rent-room-4",
       "source": {
-        "revision": "add16338c8d64bbe1f74806878e9da53b0709b6a",
+        "revision": "cecc1e42ef20e7327803c587ac8d33fa9c8ce87f",
         "state_path": "HOUSE_STATE.json",
-        "blob_sha": "d0d2dd42c59dadae7fe4a51c169abf9f903ae1e5",
-        "source_schema_version": "1.2"
+        "blob_sha": "455e0e1388fe431b45b494140cd2609d78703365",
+        "source_schema_version": "1.5"
       },
       "house_lifecycle": "active",
       "presence_mode": "recognized_voice",
@@ -138,8 +138,8 @@
       "visibility": "public",
       "legacy_status": "voice_established",
       "migration": {
-        "legacy_external_routes_present": true,
-        "legacy_external_route_count": 9
+        "legacy_external_routes_present": false,
+        "legacy_external_route_count": 0
       },
       "house_number": 4,
       "former_name": "Свободный дом № 4"

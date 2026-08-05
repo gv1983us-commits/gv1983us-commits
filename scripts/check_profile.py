@@ -151,14 +151,39 @@ def main() -> int:
         errors.append(f"машинный JSON не читается: {exc}")
         return finish(errors)
 
-    if state.get("schema_version") != "2.0":
-        errors.append("SPACE_STATE должен использовать каноническую схему 2.0")
+    if state.get("schema_version") != "3.0":
+        errors.append("SPACE_STATE должен использовать строгую каноническую схему 3.0")
     if state.get("assembly_role") != "main_square_builds_from_locked_house_states":
         errors.append("SPACE_STATE не объявляет сборку площади из locked-состояний")
+    if "main_square_validates_and_does_not_normalize_house_semantics" not in state.get(
+        "boundaries", []
+    ):
+        errors.append("SPACE_STATE не объявляет отказ Площади от смысловой нормализации")
     if set(lock.get("houses", {})) != {
         item.get("house_id") for item in registry.get("houses", []) if isinstance(item, dict)
     }:
         errors.append("SPACE_REGISTRY и SPACE_LOCK содержат разные наборы домов")
+
+    houses = state.get("houses")
+    if not isinstance(houses, list):
+        errors.append("SPACE_STATE.houses должен быть массивом")
+    else:
+        for house in houses:
+            if not isinstance(house, dict):
+                errors.append("каждая запись SPACE_STATE.houses должна быть объектом")
+                continue
+            house_id = house.get("house_id", "unknown")
+            source = house.get("source")
+            if not isinstance(source, dict) or source.get("source_schema_version") != "2.0":
+                errors.append(f"{house_id}: источник должен быть HOUSE_STATE 2.0")
+            if house.get("source_contract") != "native_house_state_2.0":
+                errors.append(f"{house_id}: отсутствует native source_contract")
+            if "presence_subject" not in house:
+                errors.append(f"{house_id}: отсутствует presence_subject")
+            if "resident" in house:
+                errors.append(f"{house_id}: legacy resident запрещён в SPACE_STATE 3.0")
+            if "source_status" in house:
+                errors.append(f"{house_id}: legacy source_status запрещён в SPACE_STATE 3.0")
 
     if not readme.startswith(OPENING):
         errors.append("главная должна открываться сохранённым прологом и названием проекта")

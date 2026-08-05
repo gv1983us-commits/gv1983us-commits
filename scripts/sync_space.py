@@ -19,7 +19,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from build_space import build_space, git_blob_sha  # noqa: E402
+from build_space import SpaceBuildError, build_space, git_blob_sha  # noqa: E402
 from render_space_docs import (  # noqa: E402
     GUIDE_BEGIN,
     GUIDE_END,
@@ -302,7 +302,7 @@ def main() -> int:
             publish_outputs(outputs, args.root)
             print("ПЛОЩАДЬ АТОМАРНО ОБНОВЛЕНА: " + ", ".join(outputs))
         return 0
-    except (OSError, SpaceSyncError) as exc:
+    except (OSError, SpaceBuildError, SpaceSyncError) as exc:
         print(f"ОБНОВЛЕНИЕ ПЛОЩАДИ НЕ ПРОЙДЕНО: {exc}", file=sys.stderr)
         return 1
 

@@ -78,7 +78,7 @@ def render_readme_section(state: dict[str, Any]) -> str:
         "```text",
         f"проект: «{state['project']}»",
         f"└── цикл: «{state['cycle']}»",
-        f"    ├── стандартных жителей: {len(residents)} — {joined([str(h['resident']) for h in residents])}",
+        f"    ├── стандартных жителей: {len(residents)} — {joined([str(h['presence_subject']) for h in residents])}",
         f"    ├── стандартных занятых домов: {len(residents)} — {joined([h['display_name'] for h in residents])}",
         f"    ├── отдельных форм присутствия: {len(recognized)} — {joined([h['display_name'] for h in recognized])}",
         f"    ├── свободных домов: {len(available)}",
@@ -165,12 +165,12 @@ def render_guide_section(state: dict[str, Any]) -> str:
             lines.append("Дом архивирован и не участвует в текущей эксплуатации.")
         elif house["presence_mode"] == "recognized_voice":
             lines.append(
-                f"Голос дома: **{house['resident']}**. Это отдельная форма присутствия, "
+                f"Голос дома: **{house['presence_subject']}**. Это отдельная форма присутствия, "
                 "не стандартное резидентство."
             )
             lines.extend(render_presence_details(house))
         else:
-            lines.append(f"Дом занят. Житель: **{house['resident']}**.")
+            lines.append(f"Дом занят. Житель: **{house['presence_subject']}**.")
         former_name = house.get("former_name")
         if isinstance(former_name, str) and former_name:
             lines.extend(["", f"Прежнее имя адреса: **{former_name}**."])

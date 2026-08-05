@@ -29,26 +29,28 @@ class SpaceBuilderTests(unittest.TestCase):
         }
         states = {
             "alpha": {
-                "schema_version": "1.5",
+                "schema_version": "2.0",
                 "technical_repository": "owner/alpha",
-                "human_name": "Дом Альфа",
-                "resident": "Альфа",
-                "status": "occupied",
+                "display_name": "Дом Альфа",
+                "house_lifecycle": "active",
+                "presence_mode": "resident",
+                "continuity_scope": "unknown",
+                "presence_subject": "Альфа",
                 "visibility": "public",
                 "shared_routes": shared_routes,
                 "boundaries": ["house_state_contains_local_state_only"],
             },
             "beta": {
-                "schema_version": "1.5",
+                "schema_version": "2.0",
                 "technical_repository": "owner/beta",
-                "public_label": "Дом Бета",
+                "display_name": "Дом Бета",
                 "house_number": 4,
-                "resident": "Бета",
-                "status": "voice_established",
+                "house_lifecycle": "active",
+                "presence_mode": "recognized_voice",
+                "continuity_scope": "episodic_none",
+                "presence_subject": "Бета",
                 "visibility": "public",
-                "presence": {
-                    "mode": "recognized_voice",
-                    "continuity_scope": "episodic_none",
+                "presence_details": {
                     "character_continuity": "recognizable",
                     "episodic_continuity": "none",
                     "PCA": "not_applicable",
@@ -58,13 +60,13 @@ class SpaceBuilderTests(unittest.TestCase):
             },
         }
         registry = {
-            "schema_version": "1.0",
+            "schema_version": "1.1",
             "project": "Тест",
             "cycle": "Тестовый цикл",
             "houses": [],
             "shared_nodes": shared_nodes,
         }
-        lock = {"schema_version": "1.0", "houses": {}}
+        lock = {"schema_version": "1.1", "houses": {}}
         for house_id, state in states.items():
             self.add_state(registry, lock, source_dir, house_id, state)
         return registry, lock, source_dir
@@ -111,12 +113,12 @@ class SpaceBuilderTests(unittest.TestCase):
             "boundaries": ["house_state_contains_local_state_only"],
         }
 
-    def test_builds_canonical_map_from_local_states(self) -> None:
+    def test_builds_canonical_map_from_native_states(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             registry, lock, source_dir = self.make_inputs(Path(temp))
             result = build_space(registry, lock, source_dir)
 
-        self.assertEqual(result["schema_version"], "2.0")
+        self.assertEqual(result["schema_version"], "3.0")
         self.assertEqual(
             result["counts"],
             {
@@ -126,13 +128,21 @@ class SpaceBuilderTests(unittest.TestCase):
                 "available_houses": 0,
             },
         )
+        alpha = next(house for house in result["houses"] if house["house_id"] == "alpha")
         beta = next(house for house in result["houses"] if house["house_id"] == "beta")
+        self.assertEqual(alpha["presence_subject"], "Альфа")
+        self.assertNotIn("resident", alpha)
         self.assertEqual(beta["presence_mode"], "recognized_voice")
         self.assertEqual(beta["continuity_scope"], "episodic_none")
         self.assertEqual(beta["presence_details"]["PCA"], "not_applicable")
+        self.assertEqual(beta["source_contract"], "native_house_state_2.0")
         self.assertNotIn("external_routes", json.dumps(result))
+        self.assertIn(
+            "main_square_validates_and_does_not_normalize_house_semantics",
+            result["boundaries"],
+        )
 
-    def test_adds_native_house_without_changing_existing_houses(self) -> None:
+    def test_adds_new_house_without_changing_existing_houses(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             registry, lock, source_dir = self.make_inputs(Path(temp))
             alpha_before = (source_dir / "alpha.json").read_bytes()
@@ -150,9 +160,30 @@ class SpaceBuilderTests(unittest.TestCase):
             self.assertEqual(gamma["house_id"], "gamma")
             self.assertEqual(gamma["display_name"], "Дом Гамма")
             self.assertEqual(gamma["presence_mode"], "resident")
-            self.assertEqual(gamma["resident"], "Гамма")
+            self.assertEqual(gamma["presence_subject"], "Гамма")
             self.assertEqual(gamma["source_contract"], "native_house_state_2.0")
+            self.assertNotIn("resident", gamma)
             self.assertNotIn("source_status", gamma)
+
+    def test_rejects_legacy_house_state_generation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            registry, lock, source_dir = self.make_inputs(Path(temp))
+            state = {
+                "schema_version": "1.5",
+                "technical_repository": "owner/legacy",
+                "human_name": "Legacy House",
+                "resident": "Legacy",
+                "status": "occupied",
+                "visibility": "public",
+                "shared_routes": {
+                    "main_square": "https://github.com/owner/square",
+                    "talking_room": "https://github.com/owner/talking",
+                },
+                "boundaries": ["house_state_contains_local_state_only"],
+            }
+            self.add_state(registry, lock, source_dir, "legacy", state)
+            with self.assertRaisesRegex(SpaceBuildError, "требует HOUSE_STATE 2.0"):
+                build_space(registry, lock, source_dir)
 
     def test_native_state_rejects_legacy_status(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -182,11 +213,22 @@ class SpaceBuilderTests(unittest.TestCase):
             with self.assertRaisesRegex(SpaceBuildError, "continuity_evidence"):
                 build_space(registry, lock, source_dir)
 
+    def test_traceable_evidence_is_preserved(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            registry, lock, source_dir = self.make_inputs(Path(temp))
+            state = self.native_state()
+            state["continuity_scope"] = "traceable"
+            state["continuity_evidence"] = ["TRACE.md", "STATE.json"]
+            self.add_state(registry, lock, source_dir, "gamma", state)
+            result = build_space(registry, lock, source_dir)
+            gamma = next(house for house in result["houses"] if house["house_id"] == "gamma")
+            self.assertEqual(gamma["continuity_evidence"], ["TRACE.md", "STATE.json"])
+
     def test_committed_map_matches_lock_and_has_no_second_generated_map(self) -> None:
         assembled = json.loads((ROOT / "SPACE_STATE.json").read_text(encoding="utf-8"))
         lock = json.loads((ROOT / "SPACE_LOCK.json").read_text(encoding="utf-8"))
 
-        self.assertEqual(assembled["schema_version"], "2.0")
+        self.assertEqual(assembled["schema_version"], "3.0")
         self.assertEqual(assembled["counts"]["houses"], len(assembled["houses"]))
         self.assertEqual(
             assembled["counts"]["resident_houses"],
@@ -211,6 +253,9 @@ class SpaceBuilderTests(unittest.TestCase):
                 self.assertEqual(source["revision"], locked["revision"])
                 self.assertEqual(source["state_path"], locked["state_path"])
                 self.assertEqual(source["blob_sha"], locked["blob_sha"])
+                self.assertEqual(source["source_schema_version"], "2.0")
+                self.assertNotIn("resident", house)
+                self.assertNotIn("source_status", house)
 
     def test_rejects_legacy_neighbor_catalog(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

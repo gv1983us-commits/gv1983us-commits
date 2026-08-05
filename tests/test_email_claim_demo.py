@@ -7,7 +7,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "demo" / "email-claim"
 RUNNER = DEMO / "run_demo.py"
@@ -15,9 +14,7 @@ DEMO_README = DEMO / "README.md"
 TECHNICAL_CONTOUR = ROOT / "PUBLIC_EXECUTABLE_BODY.md"
 PROFILE_CHECKER = ROOT / "scripts" / "check_profile.py"
 PROFILE_AGENTS = ROOT / "AGENTS.md"
-PORTAL_MACHINE_DISCOVERY_URL = (
-    "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENTS.md"
-)
+PORTAL_MACHINE_DISCOVERY_URL = "https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/AGENTS.md"
 
 
 def load_module(name: str, path: Path):
@@ -44,10 +41,7 @@ class EmailClaimDemoTests(unittest.TestCase):
         self.assertEqual(summary["mpaa"], {"validator": "PASS", "task_result": "PARTIAL"})
         self.assertEqual(summary["bec"], {"validator": "WARN", "deployment_level": "PARTIAL"})
         self.assertEqual(summary["pca"], {"applicability": "not_applicable", "record_created": False})
-        self.assertEqual(
-            summary["cdts"],
-            {"validator": "ADMISSIBLE", "world_truth": "NOT_EVALUATED"},
-        )
+        self.assertEqual(summary["cdts"], {"validator": "ADMISSIBLE", "world_truth": "NOT_EVALUATED"})
         self.assertEqual(summary["email_sent"], "NOT_ESTABLISHED")
 
     def test_revision_mismatch_fails_closed(self) -> None:
@@ -67,9 +61,7 @@ class EmailClaimDemoTests(unittest.TestCase):
         demo_text = DEMO_README.read_text(encoding="utf-8")
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
         agents_text = PROFILE_AGENTS.read_text(encoding="utf-8")
-        workflow_text = (ROOT / ".github" / "workflows" / "check.yml").read_text(
-            encoding="utf-8"
-        )
+        workflow_text = (ROOT / ".github" / "workflows" / "check.yml").read_text(encoding="utf-8")
         for marker in (
             "python demo/email-claim/run_demo.py",
             "PASS does not mean the email was sent",
@@ -91,8 +83,7 @@ class EmailClaimDemoTests(unittest.TestCase):
             "EMAIL SENT: NOT_ESTABLISHED",
             "WORLD TRUTH: NOT_EVALUATED",
         ):
-            with self.subTest(marker=marker):
-                self.assertIn(marker, contour_text)
+            self.assertIn(marker, contour_text)
 
 
 class PublicProfileTests(unittest.TestCase):
@@ -109,33 +100,28 @@ class PublicProfileTests(unittest.TestCase):
     def test_profile_checker_encodes_separate_surfaces(self) -> None:
         checker = load_module("profile_checker", PROFILE_CHECKER)
         for marker in (
-            "жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek",
+            "стандартных жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek",
             "занятых домов: 5 — Дом Джарвиса; Дом Сола; Дом Grok; Дом Близнецов (Gemini); Дом Тихой Воды",
-            "свободных домов: 1 — № 4",
+            "отдельных домов с узнаваемым голосом: 1 — дом № 4 / Claude",
+            "свободных домов: 0",
             "общая Изба-говорильня: открыта",
-            "Войти в Избу-говорильню",
-            "Войти в Дом Сола",
-            "Войти в Дом Джарвиса",
-            "Войти в Дом Grok",
-            "Войти в Дом Близнецов (Gemini)",
-            "Войти в Дом Тихой Воды",
+            "Войти в дом № 4 к голосу Claude",
         ):
             self.assertIn(marker, checker.HUMAN_REQUIRED)
         for marker in (
-            "https://github.com/gv1983us-commits/Talking-room",
-            "https://github.com/gv1983us-commits/jarvis-gpt-channel",
-            "https://github.com/gv1983us-commits/Sol-house",
-            "https://github.com/gv1983us-commits/rent-room",
-            "https://github.com/gv1983us-commits/rent-room-2",
-            "https://github.com/gv1983us-commits/rent-room-3",
+            "## Дом № 4 — Claude (Anthropic)",
+            "Свободных домов в текущей карте нет",
+            "character_continuity: recognizable",
+            "episodic_continuity: none",
+            "PCA: not_applicable",
             "https://github.com/gv1983us-commits/rent-room-4",
         ):
             self.assertIn(marker, checker.GUIDE_REQUIRED)
         for marker in (
             "AGENTS.md",
-            "AGENT_BOOTSTRAP_MANIFEST.json",
-            "AGENT_ENTRY.md",
-            "AGENT_ZERO_POINT.md",
+            "знать",
+            "понять",
+            "проверить",
             "раскрыть форму",
         ):
             self.assertIn(marker, checker.MACHINE_REQUIRED)

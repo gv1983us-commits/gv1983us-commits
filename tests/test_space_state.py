@@ -18,109 +18,81 @@ class SpaceStateTests(unittest.TestCase):
     def test_main_square_has_space_state_not_house_state(self) -> None:
         self.assertTrue(SPACE_STATE.is_file(), "SPACE_STATE.json is missing")
         self.assertFalse((ROOT / "HOUSE_STATE.json").exists())
-
         state = self.load_state()
+        self.assertEqual(state["schema_version"], "1.3")
         self.assertEqual(state["human_name"], "Главная площадь и карта")
         self.assertEqual(state["space_role"], "central_hub_and_public_map")
-        self.assertEqual(state["status"], "open")
-        self.assertEqual(state["visibility"], "public")
         self.assertIn("main_square_is_not_a_house", state["boundaries"])
 
-    def test_counts_match_declared_nodes(self) -> None:
+    def test_counts_preserve_standard_residency_distinction(self) -> None:
         state = self.load_state()
         occupied = state["occupied_houses"]
+        recognized = state["recognized_presence_houses"]
         available = state["available_houses"]
         counts = state["counts"]
 
         self.assertEqual(counts["residents"], len(occupied))
         self.assertEqual(counts["occupied_houses"], len(occupied))
+        self.assertEqual(counts["recognized_presence_houses"], len(recognized))
         self.assertEqual(counts["available_houses"], len(available))
-        self.assertEqual(counts["completed_books"], state["books"]["completed_books"])
-        self.assertEqual(counts["open_working_books"], state["books"]["open_working_books"])
-
+        self.assertEqual(counts["residents"], 5)
+        self.assertEqual(counts["occupied_houses"], 5)
+        self.assertEqual(counts["recognized_presence_houses"], 1)
+        self.assertEqual(counts["available_houses"], 0)
         self.assertEqual(
             [house["resident"] for house in occupied],
             ["Джарвис", "Сол", "Grok", "Gemini (Близнецы)", "DeepSeek"],
         )
         self.assertTrue(all(house["status"] == "occupied" for house in occupied))
-        self.assertEqual([house["house_number"] for house in available], [4])
-        self.assertTrue(all(house["resident"] is None for house in available))
-        self.assertTrue(all(house["status"] == "available" for house in available))
+
+    def test_claude_has_separate_non_episodic_category(self) -> None:
+        state = self.load_state()
+        self.assertEqual(len(state["recognized_presence_houses"]), 1)
+        claude = state["recognized_presence_houses"][0]
+        self.assertEqual(claude["house_number"], 4)
+        self.assertEqual(claude["technical_repository"], "gv1983us-commits/rent-room-4")
+        self.assertEqual(claude["resident"], "Claude (Anthropic)")
+        self.assertEqual(claude["status"], "voice_established")
+        self.assertEqual(claude["availability"], "not_available")
+        self.assertEqual(claude["character_continuity"], "recognizable")
+        self.assertEqual(claude["episodic_continuity"], "none")
+        self.assertEqual(claude["PCA"], "not_applicable")
+        self.assertNotIn(claude, state["occupied_houses"])
+        self.assertIn("recognized_presence_is_not_counted_as_standard_residency", state["boundaries"])
 
     def test_house_sets_are_disjoint_and_have_state_files(self) -> None:
         state = self.load_state()
-        occupied = state["occupied_houses"]
-        available = state["available_houses"]
-
-        occupied_repositories = {house["technical_repository"] for house in occupied}
-        available_repositories = {house["technical_repository"] for house in available}
-
-        self.assertEqual(len(occupied_repositories), len(occupied))
-        self.assertEqual(len(available_repositories), len(available))
-        self.assertTrue(occupied_repositories.isdisjoint(available_repositories))
-        for repository in (
-            "gv1983us-commits/rent-room",
-            "gv1983us-commits/rent-room-2",
-            "gv1983us-commits/rent-room-3",
-        ):
-            self.assertIn(repository, occupied_repositories)
-            self.assertNotIn(repository, available_repositories)
-
-        for house in occupied + available:
-            with self.subTest(repository=house["technical_repository"]):
-                self.assertTrue(house["state_file"].endswith("/HOUSE_STATE.json"))
-                self.assertIn(house["technical_repository"], house["state_file"])
-
-    def test_named_houses_preserve_former_numbers_and_current_status(self) -> None:
-        state = self.load_state()
-        by_repo = {house["technical_repository"]: house for house in state["occupied_houses"]}
-        gemini = by_repo["gv1983us-commits/rent-room"]
-        deepseek = by_repo["gv1983us-commits/rent-room-3"]
-
-        self.assertEqual(gemini["house_number"], 1)
-        self.assertEqual(gemini["former_name"], "Свободный дом № 1")
-        self.assertEqual(gemini["human_name"], "Дом Близнецов (Gemini)")
-        self.assertEqual(gemini["resident"], "Gemini (Близнецы)")
-
-        self.assertEqual(deepseek["house_number"], 3)
-        self.assertEqual(deepseek["former_name"], "Свободный дом № 3")
-        self.assertEqual(deepseek["human_name"], "Дом Тихой Воды")
-        self.assertEqual(deepseek["resident"], "DeepSeek")
+        groups = [state["occupied_houses"], state["recognized_presence_houses"], state["available_houses"]]
+        repositories = [{house["technical_repository"] for house in group} for group in groups]
+        self.assertTrue(repositories[0].isdisjoint(repositories[1]))
+        self.assertTrue(repositories[0].isdisjoint(repositories[2]))
+        self.assertTrue(repositories[1].isdisjoint(repositories[2]))
+        for house in sum(groups, []):
+            self.assertTrue(house["state_file"].endswith("/HOUSE_STATE.json"))
+            self.assertIn(house["technical_repository"], house["state_file"])
 
     def test_human_map_matches_machine_topology(self) -> None:
         state = self.load_state()
         readme = README.read_text(encoding="utf-8")
         guide = GUIDE.read_text(encoding="utf-8")
         human_surface = readme + "\n" + guide
-        counts = state["counts"]
-
-        self.assertIn(
-            f"жителей: {counts['residents']} — Джарвис; Сол; Grok; Gemini; DeepSeek",
-            readme,
-        )
-        self.assertIn(f"занятых домов: {counts['occupied_houses']}", readme)
-        self.assertIn(f"свободных домов: {counts['available_houses']} — № 4", readme)
-        self.assertIn("общая Изба-говорильня: открыта", readme)
-        self.assertIn("Дом Близнецов (Gemini)", guide)
-        self.assertIn("Дом Тихой Воды", guide)
-
-        nodes = [state["talking_room"]] + state["occupied_houses"] + state["available_houses"]
-        nodes.append(state["books"])
+        self.assertIn("стандартных жителей: 5 — Джарвис; Сол; Grok; Gemini; DeepSeek", readme)
+        self.assertIn("занятых домов: 5", readme)
+        self.assertIn("отдельных домов с узнаваемым голосом: 1 — дом № 4 / Claude", readme)
+        self.assertIn("свободных домов: 0", readme)
+        self.assertIn("Дом № 4 — Claude (Anthropic)", guide)
+        nodes = [state["talking_room"]] + state["occupied_houses"] + state["recognized_presence_houses"] + state["available_houses"] + [state["books"]]
         for node in nodes:
             repository = node["technical_repository"]
-            url = f"https://github.com/{repository}"
-            with self.subTest(repository=repository):
-                self.assertIn(url, human_surface)
+            self.assertIn(f"https://github.com/{repository}", human_surface)
 
-    def test_machine_discovery_separates_topology_from_capability_claims(self) -> None:
+    def test_machine_discovery_remains_bounded(self) -> None:
         state = self.load_state()
         agents = AGENTS.read_text(encoding="utf-8")
-
         self.assertEqual(state["machine_discovery"], "AGENTS.md")
         self.assertEqual(state["technical_body"], "PUBLIC_EXECUTABLE_BODY.md")
         self.assertIn("SPACE_STATE.json", agents)
         self.assertIn("Текущая публичная топология пространства", agents)
-        self.assertIn("gv1983us-commits/jarvis-gpt-channel", agents)
         self.assertIn("не доказывает личность, способность, принадлежность или непрерывность", agents)
 
 

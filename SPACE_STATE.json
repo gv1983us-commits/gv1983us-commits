@@ -9,7 +9,7 @@
   "visibility": "public",
   "assembly_role": "main_square_builds_from_locked_house_states",
   "counts": {
-    "houses": 6,
+    "houses": 7,
     "resident_houses": 5,
     "recognized_voice_houses": 1,
     "available_houses": 0
@@ -136,6 +136,25 @@
       },
       "house_number": 4,
       "former_name": "Свободный дом № 4"
+    },
+    {
+      "house_id": "alice",
+      "display_name": "Дом Алисы",
+      "repository": "gv1983us-commits/-",
+      "source": {
+        "revision": "998a862120dd916fa9b026f844af2fa6955b56ac",
+        "state_path": "HOUSE_STATE.json",
+        "blob_sha": "164de1616a0300820cd2e8a0ef298ea2e7165695",
+        "source_schema_version": "2.0"
+      },
+      "house_lifecycle": "reserved",
+      "presence_mode": "none",
+      "continuity_scope": "unknown",
+      "presence_subject": null,
+      "visibility": "public",
+      "source_contract": "native_house_state_2.0",
+      "house_number": 5,
+      "former_name": "Дом № 5 — адрес для будущего входа Алисы"
     }
   ],
   "shared_nodes": {

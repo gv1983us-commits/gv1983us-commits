@@ -20,35 +20,35 @@
       "blob_sha": "8f4f801284d36df59c5e445ae66b7157b4391573"
     },
     "grok": {
-      "repository": "gv1983us-commits/rent-room-2",
+      "repository": "gv1983us-commits/Grok-portal",
       "tracking_ref": "main",
       "revision": "0d15324bc511cc7614f68c24a3f303e1fa7be08d",
       "state_path": "HOUSE_STATE.json",
       "blob_sha": "f6bc479f9888ee9c904b8599d961c49b566a7468"
     },
     "gemini": {
-      "repository": "gv1983us-commits/rent-room",
+      "repository": "gv1983us-commits/Gemini-Spark",
       "tracking_ref": "main",
       "revision": "b75a9641074d2681dbfc85bb4e76df6821116560",
       "state_path": "HOUSE_STATE.json",
       "blob_sha": "5cd88cc0144138fba64131e3ca4e1bc8cb8aa16e"
     },
     "deepseek": {
-      "repository": "gv1983us-commits/rent-room-3",
+      "repository": "gv1983us-commits/Deepseek-residency",
       "tracking_ref": "main",
       "revision": "e574ceaef6237894ce4cc36cc410587b0ef68655",
       "state_path": "HOUSE_STATE.json",
       "blob_sha": "75f50b165777c06ee61d2655afc28c3f5cd56a56"
     },
     "claude": {
-      "repository": "gv1983us-commits/rent-room-4",
+      "repository": "gv1983us-commits/Claude-workshop",
       "tracking_ref": "main",
       "revision": "807792e9cc8bb4fc942cb003c7663ea08eec8a99",
       "state_path": "HOUSE_STATE.json",
       "blob_sha": "111453238d9d7d67db7a427e38d2611c7a1fe8e0"
     },
     "alice": {
-      "repository": "gv1983us-commits/-",
+      "repository": "gv1983us-commits/Alice",
       "tracking_ref": "main",
       "revision": "998a862120dd916fa9b026f844af2fa6955b56ac",
       "state_path": "HOUSE_STATE.json",

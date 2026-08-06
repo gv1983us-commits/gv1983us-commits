@@ -41,6 +41,24 @@ def git_blob_sha(payload: bytes) -> str:
     return hashlib.sha1(f"blob {len(payload)}\0".encode("ascii") + payload).hexdigest()
 
 
+def repository_aliases(registry: dict[str, Any]) -> dict[str, list[str]]:
+    raw = registry.get("repository_aliases", {})
+    if not isinstance(raw, dict):
+        raise SpaceBuildError("SPACE_REGISTRY.repository_aliases должен быть объектом")
+    aliases: dict[str, list[str]] = {}
+    for canonical, items in raw.items():
+        if not isinstance(canonical, str) or not canonical:
+            raise SpaceBuildError("repository_aliases требует непустые canonical-адреса")
+        if not isinstance(items, list) or not all(isinstance(item, str) and item for item in items):
+            raise SpaceBuildError(f"repository_aliases[{canonical}] должен быть массивом строк")
+        aliases[canonical] = list(items)
+    return aliases
+
+
+def accepted_repositories(repository: str, aliases: dict[str, list[str]]) -> set[str]:
+    return {repository, *aliases.get(repository, [])}
+
+
 def validate_sources(registry: dict[str, Any], lock: dict[str, Any]) -> list[tuple[str, dict[str, str]]]:
     houses = registry.get("houses")
     locked = lock.get("houses")
@@ -85,7 +103,12 @@ def validate_sources(registry: dict[str, Any], lock: dict[str, Any]) -> list[tup
     return result
 
 
-def load_locked_house(source_dir: Path, house_id: str, lock_entry: dict[str, str]) -> dict[str, Any]:
+def load_locked_house(
+    source_dir: Path,
+    house_id: str,
+    lock_entry: dict[str, str],
+    accepted_technical_repositories: set[str],
+) -> dict[str, Any]:
     path = source_dir / f"{house_id}.json"
     try:
         payload = path.read_bytes()
@@ -100,7 +123,7 @@ def load_locked_house(source_dir: Path, house_id: str, lock_entry: dict[str, str
         state = json.loads(payload.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise SpaceBuildError(f"snapshot {house_id} не является UTF-8 JSON") from exc
-    if not isinstance(state, dict) or state.get("technical_repository") != lock_entry["repository"]:
+    if not isinstance(state, dict) or state.get("technical_repository") not in accepted_technical_repositories:
         raise SpaceBuildError(f"technical_repository расходится для {house_id}")
     return state
 
@@ -119,16 +142,39 @@ def expected_shared_routes(registry: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def accepted_shared_routes(
+    registry: dict[str, Any],
+    aliases: dict[str, list[str]],
+) -> dict[str, set[str]]:
+    shared = registry.get("shared_nodes")
+    if not isinstance(shared, dict):
+        raise SpaceBuildError("SPACE_REGISTRY.shared_nodes должен быть объектом")
+    result: dict[str, set[str]] = {}
+    for key in ("main_square", "talking_room"):
+        repository = shared.get(key)
+        if not isinstance(repository, str) or not repository:
+            raise SpaceBuildError(f"registry требует shared_nodes.{key}")
+        result[key] = {
+            f"https://github.com/{candidate}"
+            for candidate in accepted_repositories(repository, aliases)
+        }
+    return result
+
+
 def validate_local_house(
     house_id: str,
     state: dict[str, Any],
     shared_routes: dict[str, str],
+    route_aliases: dict[str, set[str]],
 ) -> None:
     if "external_routes" in state:
         raise SpaceBuildError(f"{house_id} содержит запрещённый ручной каталог external_routes")
     actual_routes = state.get("shared_routes")
-    if actual_routes != shared_routes:
+    if not isinstance(actual_routes, dict) or set(actual_routes) != set(shared_routes):
         raise SpaceBuildError(f"{house_id}.shared_routes расходится с registry")
+    for key in shared_routes:
+        if actual_routes.get(key) not in route_aliases[key]:
+            raise SpaceBuildError(f"{house_id}.shared_routes расходится с registry: {key}")
     boundaries = state.get("boundaries")
     if not isinstance(boundaries, list) or "house_state_contains_local_state_only" not in boundaries:
         raise SpaceBuildError(f"{house_id} не объявляет локальную границу HOUSE_STATE")
@@ -231,10 +277,17 @@ def project_native_house(
 
 def build_space(registry: dict[str, Any], lock: dict[str, Any], source_dir: Path) -> dict[str, Any]:
     routes = expected_shared_routes(registry)
+    aliases = repository_aliases(registry)
+    route_aliases = accepted_shared_routes(registry, aliases)
     houses: list[dict[str, Any]] = []
     for house_id, entry in validate_sources(registry, lock):
-        state = load_locked_house(source_dir, house_id, entry)
-        validate_local_house(house_id, state, routes)
+        state = load_locked_house(
+            source_dir,
+            house_id,
+            entry,
+            accepted_repositories(entry["repository"], aliases),
+        )
+        validate_local_house(house_id, state, routes, route_aliases)
         houses.append(project_native_house(house_id, state, entry))
 
     numbers = [house["house_number"] for house in houses if "house_number" in house]

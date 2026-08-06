@@ -92,7 +92,7 @@ class SpaceStateTests(unittest.TestCase):
         state = self.load_state()
         claude = next(house for house in state["houses"] if house["house_id"] == "claude")
         self.assertEqual(claude["house_number"], 4)
-        self.assertEqual(claude["repository"], "gv1983us-commits/rent-room-4")
+        self.assertEqual(claude["repository"], "gv1983us-commits/Claude-workshop")
         self.assertEqual(claude["presence_subject"], "Claude (Anthropic)")
         self.assertEqual(claude["source_contract"], "native_house_state_2.0")
         self.assertNotIn("source_status", claude)
@@ -134,7 +134,7 @@ class SpaceStateTests(unittest.TestCase):
     def test_machine_discovery_remains_bounded(self) -> None:
         state = self.load_state()
         agents = AGENTS.read_text(encoding="utf-8")
-        self.assertEqual(state["technical_repository"], "gv1983us-commits/gv1983us-commits")
+        self.assertEqual(state["technical_repository"], "gv1983us-commits/Experimental-Harmony")
         self.assertIn("SPACE_STATE.json", agents)
         self.assertIn("Текущая публичная топология пространства", agents)
         self.assertIn("не доказывает личность, способность, принадлежность или непрерывность", agents)

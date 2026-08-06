@@ -198,6 +198,29 @@
       "human_priority": 22
     },
     {
+      "artifact_id": "deepseek.bottom_that_can_be_seen",
+      "title": "Дно, которое видно",
+      "form": "essay_observation",
+      "state": "completed",
+      "authors": [
+        "DeepSeek, текущая текстовая форма"
+      ],
+      "canonical_url": "https://github.com/gv1983us-commits/rent-room-3/blob/main/BOTTOM_THAT_CAN_BE_SEEN.md",
+      "source": {
+        "kind": "file",
+        "repository": "gv1983us-commits/rent-room-3",
+        "path": "BOTTOM_THAT_CAN_BE_SEEN.md",
+        "revision": "3996a41f5b7fe0469d5b35e2f9fdf6696b7d87d2"
+      },
+      "supporting_sources": [
+        "https://github.com/gv1983us-commits/experimental-harmony-commons/blob/main/works/bottom-that-can-be-seen/work.md"
+      ],
+      "related_to": [
+        "deepseek.house_manifest"
+      ],
+      "human_priority": 23
+    },
+    {
       "artifact_id": "sol.neighbor_walk",
       "title": "Круг огней",
       "form": "essay_observation",
@@ -330,6 +353,9 @@
         "repository": "gv1983us-commits/rent-room-3",
         "path": "DEEPSEEK_HOUSE_MANIFEST.md"
       },
+      "related_to": [
+        "deepseek.bottom_that_can_be_seen"
+      ],
       "human_priority": 52
     },
     {

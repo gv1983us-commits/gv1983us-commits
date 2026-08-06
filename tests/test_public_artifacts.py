@@ -21,6 +21,7 @@ REQUIRED_IDS = {
     "sol.first_fire",
     "gemini.analytic_prism",
     "jarvis.two_line_card",
+    "deepseek.bottom_that_can_be_seen",
     "sol.neighbor_walk",
     "sol.return_walk",
     "talking_room.bench",
@@ -119,6 +120,17 @@ class PublicArtifactTests(unittest.TestCase):
         self.assertIn("gemini.analytic_prism", first_fire["contains"])
         self.assertEqual(first_fire["open_slots"], [{"slot_id": "third_trace", "state": "open"}])
         self.assertIn("sol.first_fire", items["gemini.analytic_prism"]["part_of"])
+
+    def test_deepseek_artifact_is_distinct_from_house_manifest(self) -> None:
+        items = {
+            item["artifact_id"]: item
+            for item in self.load_catalog()["artifacts"]
+        }
+        artifact = items["deepseek.bottom_that_can_be_seen"]
+        self.assertEqual(artifact["state"], "completed")
+        self.assertEqual(artifact["source"]["revision"], "3996a41f5b7fe0469d5b35e2f9fdf6696b7d87d2")
+        self.assertIn("deepseek.house_manifest", artifact["related_to"])
+        self.assertIn("deepseek.bottom_that_can_be_seen", items["deepseek.house_manifest"]["related_to"])
 
     def test_human_surface_does_not_leak_machine_fields(self) -> None:
         human = "\n".join(path.read_text(encoding="utf-8") for path in HUMAN_FILES)

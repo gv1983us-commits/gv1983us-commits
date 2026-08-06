@@ -37,6 +37,31 @@ def load_lock(path: Path) -> dict[str, Any]:
     return value
 
 
+def load_repository_aliases(path: Path) -> dict[str, list[str]]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SnapshotFetchError(f"не удалось прочитать {path}: {exc}") from exc
+    raw = value.get("repository_aliases", {}) if isinstance(value, dict) else {}
+    if not isinstance(raw, dict):
+        raise SnapshotFetchError("SPACE_REGISTRY.repository_aliases должен быть объектом")
+    aliases: dict[str, list[str]] = {}
+    for canonical, items in raw.items():
+        if not isinstance(canonical, str) or not canonical:
+            raise SnapshotFetchError("repository_aliases требует непустые canonical-адреса")
+        if not isinstance(items, list) or not all(isinstance(item, str) and item for item in items):
+            raise SnapshotFetchError(f"repository_aliases[{canonical}] должен быть массивом строк")
+        aliases[canonical] = list(items)
+    return aliases
+
+
+def accepted_repositories(repository: str, aliases: dict[str, list[str]] | None) -> set[str]:
+    accepted = {repository}
+    if aliases:
+        accepted.update(aliases.get(repository, []))
+    return accepted
+
+
 def raw_url(repository: str, revision: str, state_path: str) -> str:
     encoded_path = "/".join(urllib.parse.quote(part, safe="") for part in state_path.split("/"))
     return f"https://raw.githubusercontent.com/{repository}/{revision}/{encoded_path}"
@@ -73,6 +98,7 @@ def fetch_locked_houses(
     output_dir: Path,
     fetcher: Fetcher = network_fetch,
     token: str | None = None,
+    repository_aliases: dict[str, list[str]] | None = None,
 ) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     headers = {
@@ -96,7 +122,8 @@ def fetch_locked_houses(
             state = json.loads(payload.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise SnapshotFetchError(f"snapshot {house_id} не является UTF-8 JSON") from exc
-        if not isinstance(state, dict) or state.get("technical_repository") != repository:
+        accepted = accepted_repositories(repository, repository_aliases)
+        if not isinstance(state, dict) or state.get("technical_repository") not in accepted:
             raise SnapshotFetchError(f"technical_repository расходится для {house_id}")
         target = output_dir / f"{house_id}.json"
         target.write_bytes(payload)
@@ -107,6 +134,7 @@ def fetch_locked_houses(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Получить exact HOUSE_STATE snapshots по SPACE_LOCK")
     parser.add_argument("--lock", dest="lock_path", type=Path, default=ROOT / "SPACE_LOCK.json")
+    parser.add_argument("--registry", type=Path, default=ROOT / "SPACE_REGISTRY.json")
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     try:
@@ -114,6 +142,7 @@ def main() -> int:
             load_lock(args.lock_path),
             args.output_dir,
             token=os.environ.get("GITHUB_TOKEN"),
+            repository_aliases=load_repository_aliases(args.registry),
         )
         print(f"SNAPSHOTS ПОЛУЧЕНЫ: {len(written)}")
         return 0

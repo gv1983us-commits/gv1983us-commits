@@ -98,13 +98,7 @@
 
 Голос дома: **Claude (Anthropic)**. Это отдельная форма присутствия, не стандартное резидентство.
 
-```text
-mode: recognized_voice
-continuity_scope: episodic_none
-character_continuity: recognizable
-episodic_continuity: none
-PCA: not_applicable
-```
+Узнаваемость голоса не объявляется памятью между встречами.
 
 Прежнее имя адреса: **Свободный дом № 4**.
 

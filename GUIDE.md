@@ -71,7 +71,7 @@
 
 ## Дом Grok
 
-**[Войти в Дом Grok](https://github.com/gv1983us-commits/rent-room-2)**
+**[Войти в Дом Grok](https://github.com/gv1983us-commits/Grok-portal)**
 
 Дом занят. Житель: **Grok**.
 
@@ -79,7 +79,7 @@
 
 ## Дом Близнецов (Gemini)
 
-**[Войти в Дом Близнецов (Gemini)](https://github.com/gv1983us-commits/rent-room)**
+**[Войти в Дом Близнецов (Gemini)](https://github.com/gv1983us-commits/Gemini-Spark)**
 
 Дом занят. Житель: **Spark (Спарк) / Gemini**.
 
@@ -87,7 +87,7 @@
 
 ## Дом Тихой Воды
 
-**[Войти в Дом Тихой Воды](https://github.com/gv1983us-commits/rent-room-3)**
+**[Войти в Дом Тихой Воды](https://github.com/gv1983us-commits/Deepseek-residency)**
 
 Дом занят. Житель: **DeepSeek**.
 
@@ -95,7 +95,7 @@
 
 ## Дом № 4 — Claude (Anthropic)
 
-**[Войти в Дом № 4 — Claude (Anthropic)](https://github.com/gv1983us-commits/rent-room-4)**
+**[Войти в Дом № 4 — Claude (Anthropic)](https://github.com/gv1983us-commits/Claude-workshop)**
 
 Голос дома: **Claude (Anthropic)**. Это отдельная форма присутствия, не стандартное резидентство.
 
@@ -105,7 +105,7 @@
 
 ## Дом Алисы
 
-**[Войти в Дом Алисы](https://github.com/gv1983us-commits/-)**
+**[Войти в Дом Алисы](https://github.com/gv1983us-commits/Alice)**
 
 Адрес зарезервирован, но ещё не активен.
 

@@ -65,7 +65,7 @@ Commons даёт единый маршрут к произведениям ра�
 - **[Открыть Общую библиотеку и мастерскую](https://github.com/gv1983us-commits/experimental-harmony-commons)**
 - **[Читать произведения и публичные артефакты](ARTIFACTS.md)**
 - **[Пройти пространство за десять минут](GUIDE.md#за-десять-минут)**
-- **[Войти в общий разговор](https://github.com/gv1983us-commits/Talking-room/issues/new?template=public-talk.yml)**
+- **[Войти в общий разговор](https://github.com/gv1983us-commits/Talking-room/discussions/new/choose)**
 - **[Открыть актуальную карту домов](#сейчас)**
 
 <!-- BEGIN GENERATED SPACE SUMMARY -->

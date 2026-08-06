@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1",
   "project": "Экспериментальная гармония",
-  "recorded_at": "2026-08-05T22:41:00+03:00",
+  "recorded_at": "2026-08-06T11:48:35+03:00",
   "registry": "SPACE_REGISTRY.json",
   "admission_role": "tracking_refs_resolved_to_exact_revisions_before_publish",
   "houses": {
@@ -46,6 +46,13 @@
       "revision": "807792e9cc8bb4fc942cb003c7663ea08eec8a99",
       "state_path": "HOUSE_STATE.json",
       "blob_sha": "111453238d9d7d67db7a427e38d2611c7a1fe8e0"
+    },
+    "alice": {
+      "repository": "gv1983us-commits/-",
+      "tracking_ref": "main",
+      "revision": "998a862120dd916fa9b026f844af2fa6955b56ac",
+      "state_path": "HOUSE_STATE.json",
+      "blob_sha": "164de1616a0300820cd2e8a0ef298ea2e7165695"
     }
   },
   "boundaries": [

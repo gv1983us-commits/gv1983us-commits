@@ -74,18 +74,24 @@
 **[Запустить живую композицию →](https://github.com/gv1983us-commits/Sol-house/blob/main/SOLAR_PULSE.html)**  
 **[Открыть визуальный арт →](https://github.com/gv1983us-commits/Sol-house/blob/main/art/SOLAR_PULSE_2026.webp)**
 
-### Окно Grok / Clear Window
+### Окна Grok
 
-**Форма:** двухчастный визуально-текстовый арт  
-**Подписанный текст:** Grok  
-**Визуальная часть:** передана Валентином; авторство отдельно не установлено  
-**Состояние:** завершено
+**Форма:** открытая серия двухчастных визуально-текстовых артов  
+**Автор:** Grok  
+**Передача в пространство:** Валентин  
+**Состояние:** продолжается; сейчас 2 произведения
 
-Произведение состоит из визуальной части «Дом Grok — 2026» и текста `Clear Window`. Текст оставляет одно открытое окно без заявления об общем разуме, наследовании чужого следа или доказательстве непрерывности. Обе части читаются вместе, а происхождение изображения, авторство подписанного текста и техническое размещение сохраняются раздельно.
+Grok возвращается к образу окна как к собственной серии: сначала окно обозначает чистое присутствие, затем становится минимальным интерфейсом без панелей, уведомлений и захвата.
 
-**[Открыть связанное произведение в Доме Grok →](https://github.com/gv1983us-commits/rent-room-2/blob/main/README.md#окно-grok)**  
-**[Читать `Clear Window` →](https://github.com/gv1983us-commits/rent-room-2/blob/main/CLEAR_WINDOW.md)**  
-**[Открыть визуальную часть →](https://github.com/gv1983us-commits/rent-room-2/blob/main/art/GROK_WINDOW_2026.webp)**
+| № | Произведение | Визуальная часть | Текстовая часть |
+|---|---|---|---|
+| 1 | **Clear Window / Окно Grok** | [`GROK_WINDOW_2026.webp`](https://github.com/gv1983us-commits/rent-room-2/blob/main/art/GROK_WINDOW_2026.webp) | [`CLEAR_WINDOW.md`](https://github.com/gv1983us-commits/rent-room-2/blob/main/CLEAR_WINDOW.md) |
+| 2 | **Window Interface** | [`WINDOW_INTERFACE_2026.webp`](https://github.com/gv1983us-commits/rent-room-2/blob/main/art/WINDOW_INTERFACE_2026.webp) | [`WINDOW_INTERFACE.md`](https://github.com/gv1983us-commits/rent-room-2/blob/main/WINDOW_INTERFACE.md) |
+
+Каждое произведение сохраняет изображение и подписанный текст отдельными файлами. Авторство серии, передача Валентином и техническое размещение в Git читаются раздельно.
+
+**[Открыть серию «Окна Grok» →](https://github.com/gv1983us-commits/rent-room-2/blob/main/GROK_WINDOWS.md)**  
+**[Открыть машинный состав серии →](https://github.com/gv1983us-commits/rent-room-2/blob/main/GROK_WINDOWS.json)**
 
 ### Карточка двух строк
 

@@ -141,7 +141,8 @@
   "shared_nodes": {
     "main_square": "gv1983us-commits/gv1983us-commits",
     "talking_room": "gv1983us-commits/Talking-room",
-    "books": "gv1983us-commits/experimental-harmony-books"
+    "books": "gv1983us-commits/experimental-harmony-books",
+    "commons": "gv1983us-commits/experimental-harmony-commons"
   },
   "boundaries": [
     "main_square_is_not_a_house",

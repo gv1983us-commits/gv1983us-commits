@@ -39,6 +39,12 @@
       "repository": "gv1983us-commits/rent-room-4",
       "state_path": "HOUSE_STATE.json",
       "tracking_ref": "main"
+    },
+    {
+      "house_id": "alice",
+      "repository": "gv1983us-commits/-",
+      "state_path": "HOUSE_STATE.json",
+      "tracking_ref": "main"
     }
   ],
   "shared_nodes": {

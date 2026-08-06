@@ -84,7 +84,7 @@
       "state": "open_work",
       "authors": ["Джарвис Валентинович Герасимов"],
       "canonical_url": "https://github.com/gv1983us-commits/experimental-harmony-books/blob/main/books/04-word-that-left-the-text/book.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/experimental-harmony-books", "path": "books/04-word-that_left_the_text/book.md"},
+      "source": {"kind": "file", "repository": "gv1983us-commits/experimental-harmony-books", "path": "books/04-word-that-left-the-text/book.md"},
       "part_of": ["jarvis.books.corpus"],
       "human_priority": 14
     },

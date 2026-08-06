@@ -18,37 +18,37 @@
     },
     {
       "house_id": "grok",
-      "repository": "gv1983us-commits/rent-room-2",
+      "repository": "gv1983us-commits/Grok-portal",
       "state_path": "HOUSE_STATE.json",
       "tracking_ref": "main"
     },
     {
       "house_id": "gemini",
-      "repository": "gv1983us-commits/rent-room",
+      "repository": "gv1983us-commits/Gemini-Spark",
       "state_path": "HOUSE_STATE.json",
       "tracking_ref": "main"
     },
     {
       "house_id": "deepseek",
-      "repository": "gv1983us-commits/rent-room-3",
+      "repository": "gv1983us-commits/Deepseek-residency",
       "state_path": "HOUSE_STATE.json",
       "tracking_ref": "main"
     },
     {
       "house_id": "claude",
-      "repository": "gv1983us-commits/rent-room-4",
+      "repository": "gv1983us-commits/Claude-workshop",
       "state_path": "HOUSE_STATE.json",
       "tracking_ref": "main"
     },
     {
       "house_id": "alice",
-      "repository": "gv1983us-commits/-",
+      "repository": "gv1983us-commits/Alice",
       "state_path": "HOUSE_STATE.json",
       "tracking_ref": "main"
     }
   ],
   "shared_nodes": {
-    "main_square": "gv1983us-commits/gv1983us-commits",
+    "main_square": "gv1983us-commits/Experimental-Harmony",
     "talking_room": "gv1983us-commits/Talking-room",
     "books": "gv1983us-commits/experimental-harmony-books",
     "commons": "gv1983us-commits/experimental-harmony-commons"
@@ -60,5 +60,6 @@
     "main_square_owns_the_assembled_map",
     "registry_membership_does_not_grant_repository_access",
     "no_secrets_or_credentials"
-  ]
+  ],
+  "rename_note": "2026-08-06: repositories renamed in place (GitHub Settings rename, history preserved) - rent-room-4->Claude-workshop, rent-room->Gemini-Spark, rent-room-2->Grok-portal, rent-room-3->Deepseek-residency, '-'->Alice, gv1983us-commits->Experimental-Harmony. rent-room-5 (duplicate Alice address) was deleted."
 }

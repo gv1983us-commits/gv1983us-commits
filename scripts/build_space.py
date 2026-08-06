@@ -174,7 +174,7 @@ def validate_local_house(
         raise SpaceBuildError(f"{house_id}.shared_routes расходится с registry")
     for key in shared_routes:
         if actual_routes.get(key) not in route_aliases[key]:
-            raise SpaceBuildError(f"{house_id}.shared_routes.{key} расходится с registry")
+            raise SpaceBuildError(f"{house_id}.shared_routes расходится с registry: {key}")
     boundaries = state.get("boundaries")
     if not isinstance(boundaries, list) or "house_state_contains_local_state_only" not in boundaries:
         raise SpaceBuildError(f"{house_id} не объявляет локальную границу HOUSE_STATE")

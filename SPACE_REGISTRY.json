@@ -3,6 +3,7 @@
   "project": "Экспериментальная гармония",
   "cycle": "Жизнь в информационной Солнечной системе",
   "registry_role": "central_source_directory_with_explicit_tracking_refs",
+  "topology_policy": "SPACE_POLICY.json",
   "houses": [
     {
       "house_id": "jarvis",
@@ -53,12 +54,33 @@
     "books": "gv1983us-commits/experimental-harmony-books",
     "commons": "gv1983us-commits/experimental-harmony-commons"
   },
+  "repository_aliases": {
+    "gv1983us-commits/Experimental-Harmony": [
+      "gv1983us-commits/gv1983us-commits"
+    ],
+    "gv1983us-commits/Grok-portal": [
+      "gv1983us-commits/rent-room-2"
+    ],
+    "gv1983us-commits/Gemini-Spark": [
+      "gv1983us-commits/rent-room"
+    ],
+    "gv1983us-commits/Deepseek-residency": [
+      "gv1983us-commits/rent-room-3"
+    ],
+    "gv1983us-commits/Claude-workshop": [
+      "gv1983us-commits/rent-room-4"
+    ],
+    "gv1983us-commits/Alice": [
+      "gv1983us-commits/-"
+    ]
+  },
   "boundaries": [
     "tracking_ref_is_an_admission_input_not_a_reproducible_source",
     "registry_names_sources_but_does_not_copy_house_state",
     "house_owns_its_local_state",
     "main_square_owns_the_assembled_map",
     "registry_membership_does_not_grant_repository_access",
+    "repository_aliases_only_bridge_verified_in_place_renames",
     "no_secrets_or_credentials"
   ],
   "rename_note": "2026-08-06: repositories renamed in place (GitHub Settings rename, history preserved) - rent-room-4->Claude-workshop, rent-room->Gemini-Spark, rent-room-2->Grok-portal, rent-room-3->Deepseek-residency, '-'->Alice, gv1983us-commits->Experimental-Harmony. rent-room-5 (duplicate Alice address) was deleted."

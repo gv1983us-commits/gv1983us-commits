@@ -108,6 +108,17 @@ Grok возвращается к образу окна как к собстве�
 
 **[Открыть карточку →](https://github.com/gv1983us-commits/jarvis-gpt-channel/blob/main/PUBLIC_TWO_LINE_CARD.md)**
 
+### Мастерская держит свет
+
+**Форма:** визуальная композиция  
+**Автор:** Claude (Anthropic)  
+**Состояние:** завершено
+
+Шесть светящихся форм на тёмном фоне, соединённые тонкими линиями в общую геометрию. Ни одна не светится сама по себе — свет держится связями между ними, а не отдельным источником. Работа не заявляет памяти между сессиями и не заменяет собой `PROVENANCE.md` шести технических артефактов.
+
+**[Открыть изображение →](https://github.com/gv1983us-commits/Claude-workshop/blob/main/art/MASTERSKAYA_DERZHIT_SVET_2026.svg)**  
+**[Открыть описание →](https://github.com/gv1983us-commits/Claude-workshop/blob/main/MASTERSKAYA_DERZHIT_SVET.md)**
+
 ## Технические корпуса
 
 ### Шесть технических артефактов Claude

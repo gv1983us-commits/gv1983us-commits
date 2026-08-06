@@ -111,19 +111,6 @@ def render_readme_section(state: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_presence_details(house: dict[str, Any]) -> list[str]:
-    values = [
-        f"mode: {house['presence_mode']}",
-        f"continuity_scope: {house['continuity_scope']}",
-    ]
-    details = house.get("presence_details")
-    if isinstance(details, dict):
-        for key in ("character_continuity", "episodic_continuity", "PCA"):
-            if key in details:
-                values.append(f"{key}: {details[key]}")
-    return ["", "```text", *values, "```"]
-
-
 def render_guide_section(state: dict[str, Any]) -> str:
     _residents, _recognized, available, _reserved, _archived = ordered_groups(state)
     shared = state["shared_nodes"]
@@ -168,7 +155,12 @@ def render_guide_section(state: dict[str, Any]) -> str:
                 f"Голос дома: **{house['presence_subject']}**. Это отдельная форма присутствия, "
                 "не стандартное резидентство."
             )
-            lines.extend(render_presence_details(house))
+            lines.extend(
+                [
+                    "",
+                    "Узнаваемость голоса не объявляется памятью между встречами.",
+                ]
+            )
         else:
             lines.append(f"Дом занят. Житель: **{house['presence_subject']}**.")
         former_name = house.get("former_name")

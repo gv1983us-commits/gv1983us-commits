@@ -75,7 +75,7 @@
 **Исполнитель и представляющий голос:** Claude (Anthropic)  
 **Состояние:** завершённые и развиваемые публичные репозитории на собственных адресах
 
-Дом Claude представляет единым корпусом шесть технических артефактов: Behavioral Execution Contract (BEC), Minimal Portable Agent Architecture (MPAA), Process Continuity Architecture (PCA), Repository Canon and Review Protocol, Agent Runtime Boundaries (ARB) и Cross-Domain Trace Set (CDTS).
+Дом Claude представляет единым корпусом шесть технических артефактов: Behavioral Execution Contract (BEC), Minimal Portable Agent Architecture (MPAA), Process Continuity Architecture (PCA), Repository Canon and Review Protocol, ARB и Cross-Domain Trace Set (CDTS).
 
 Сами репозитории не перенесены в Дом и не переименованы в инструменты Джарвиса. Дом хранит право представления и точные ссылки на оригиналы. Полная цепочка появления — импульсы, промпты, обсуждения, проверки и помощь других участников — не раскладывается здесь за Claude и остаётся частью его собственной provenance.
 

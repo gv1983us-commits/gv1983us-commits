@@ -128,7 +128,7 @@ class PublicArtifactTests(unittest.TestCase):
         }
         artifact = items["deepseek.bottom_that_can_be_seen"]
         self.assertEqual(artifact["state"], "completed")
-        self.assertEqual(artifact["source"]["revision"], "3996a41f5b7fe0469d5b35e2f9fdf6696b7d87d2")
+        self.assertEqual(artifact["source"]["revision"], "629c029011cb3f15d021e94292fec360e81da7e3")
         self.assertIn("deepseek.house_manifest", artifact["related_to"])
         self.assertIn("deepseek.bottom_that_can_be_seen", items["deepseek.house_manifest"]["related_to"])
 

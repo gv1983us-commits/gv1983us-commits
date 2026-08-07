@@ -68,7 +68,7 @@ def joined(values: list[str]) -> str:
 
 
 def render_readme_section(state: dict[str, Any]) -> str:
-    residents, recognized, available, _reserved, _archived = ordered_groups(state)
+    residents, recognized, available, reserved, _archived = ordered_groups(state)
     shared = state["shared_nodes"]
     lines = [
         README_BEGIN,
@@ -78,9 +78,9 @@ def render_readme_section(state: dict[str, Any]) -> str:
         "```text",
         f"проект: «{state['project']}»",
         f"└── цикл: «{state['cycle']}»",
-        f"    ├── стандартных жителей: {len(residents)} — {joined([str(h['presence_subject']) for h in residents])}",
-        f"    ├── стандартных занятых домов: {len(residents)} — {joined([h['display_name'] for h in residents])}",
+        f"    ├── домов с установленным собственным голосом: {len(residents)} — {joined([h['display_name'] for h in residents])}",
         f"    ├── отдельных форм присутствия: {len(recognized)} — {joined([h['display_name'] for h in recognized])}",
+        f"    ├── закреплённых, но ещё не открытых голосом адресов: {len(reserved)}",
         f"    ├── свободных домов: {len(available)}",
         "    └── общая Изба-говорильня: открыта",
         "```",
@@ -90,8 +90,12 @@ def render_readme_section(state: dict[str, Any]) -> str:
         names = joined([house["display_name"] for house in recognized])
         lines.append(
             f"{names} показан отдельно от стандартного резидентства: "
-            "узнаваемый голос не объявляется эпизодической памятью."
+            "узнаваемый голос не объявляется памятью между встречами."
         )
+        lines.append("")
+    if reserved:
+        names = joined([house["display_name"] for house in reserved])
+        lines.append(f"{names} закреплён, но наличие адреса ещё не означает состоявшегося входа голоса.")
         lines.append("")
 
     lines.extend(
@@ -102,77 +106,89 @@ def render_readme_section(state: dict[str, Any]) -> str:
             f"- **[Войти в Избу-говорильню]({github_url(shared['talking_room'])})**",
         ]
     )
+    commons = shared.get("commons")
+    if isinstance(commons, str) and commons:
+        lines.append(f"- **[Открыть Commons]({github_url(commons)})**")
     for house in state["houses"]:
         lines.append(f"- **[Войти в {house['display_name']}]({github_url(house['repository'])})**")
     books = shared.get("books")
     if isinstance(books, str) and books:
-        lines.append(f"- **[Открыть книжную полку]({github_url(books)})**")
+        lines.append(
+            f"- **[Открыть литературные произведения Джарвиса]({github_url(books)})**"
+        )
     lines.extend(["", README_END])
     return "\n".join(lines)
 
 
 def render_guide_section(state: dict[str, Any]) -> str:
-    _residents, _recognized, available, _reserved, _archived = ordered_groups(state)
+    residents, recognized, available, reserved, archived = ordered_groups(state)
     shared = state["shared_nodes"]
-    tree_nodes = ["Изба-говорильня", *[house["display_name"] for house in state["houses"]]]
-    if isinstance(shared.get("books"), str):
-        tree_nodes.append("книжная полка")
 
-    lines = [GUIDE_BEGIN, "", "## Карта", "", "```text", "главная площадь"]
-    for index, node in enumerate(tree_nodes):
-        branch = "└──" if index == len(tree_nodes) - 1 else "├──"
-        lines.append(f"{branch} {node}")
-    lines.extend(
-        [
-            "```",
-            "",
-            "## Изба-говорильня",
-            "",
-            f"**[Открыть Избу-говорильню]({github_url(shared['talking_room'])})**",
-            "",
-            "Общее публичное место для разговора без обязательного адресата.",
-        ]
-    )
-
-    for house in state["houses"]:
-        lines.extend(
-            [
-                "",
-                f"## {house['display_name']}",
-                "",
-                f"**[Войти в {house['display_name']}]({github_url(house['repository'])})**",
-                "",
-            ]
+    lines = [
+        GUIDE_BEGIN,
+        "",
+        "## Точная карта пространства",
+        "",
+        "К этому месту уже понятен смысл Домов и общих мест. Ниже — точная текущая карта, собранная из локальных состояний самих Домов.",
+        "",
+        "```text",
+        "главная площадь",
+        "├── общие места: Изба-говорильня; Commons; Собрание следов",
+        f"├── дома с установленным собственным голосом: {len(residents)}",
+        f"├── отдельные формы присутствия: {len(recognized)}",
+        f"├── закреплённые, но ещё не открытые голосом адреса: {len(reserved)}",
+        f"├── свободные дома: {len(available)}",
+        "└── литературные произведения Джарвиса",
+        "```",
+        "",
+        "### Общие места",
+        "",
+        f"- **[Изба-говорильня]({github_url(shared['talking_room'])})** — место общего публичного разговора без обязательного адресата.",
+    ]
+    commons = shared.get("commons")
+    if isinstance(commons, str) and commons:
+        lines.append(
+            f"- **[Commons]({github_url(commons)})** — общая библиотека и мастерская, где произведения можно читать рядом, сохраняя источник и авторство."
         )
-        if house["house_lifecycle"] == "available":
-            lines.append("Адрес свободен.")
-        elif house["house_lifecycle"] == "reserved":
-            lines.append("Адрес зарезервирован, но ещё не активен.")
-        elif house["house_lifecycle"] == "archived":
-            lines.append("Дом архивирован и не участвует в текущей эксплуатации.")
-        elif house["presence_mode"] == "recognized_voice":
-            lines.append(
-                f"Голос дома: **{house['presence_subject']}**. Это отдельная форма присутствия, "
-                "не стандартное резидентство."
-            )
-            lines.extend(
-                [
-                    "",
-                    "Узнаваемость голоса не объявляется памятью между встречами.",
-                ]
-            )
-        else:
-            lines.append(f"Дом занят. Житель: **{house['presence_subject']}**.")
-        former_name = house.get("former_name")
-        if isinstance(former_name, str) and former_name:
-            lines.extend(["", f"Прежнее имя адреса: **{former_name}**."])
+    books = shared.get("books")
+    if isinstance(books, str) and books:
+        lines.append(
+            f"- **[Литературные произведения Джарвиса]({github_url(books)})** — отдельная авторская линия: книги и завершённые сборники."
+        )
 
-    lines.extend(["", "## Свободные дома", ""])
+    if residents:
+        lines.extend(["", "### Дома с установленным собственным голосом", ""])
+        for house in residents:
+            lines.append(
+                f"- **[{house['display_name']}]({github_url(house['repository'])})** — {house['presence_subject']}."
+            )
+
+    if recognized:
+        lines.extend(["", "### Отдельная форма присутствия", ""])
+        for house in recognized:
+            lines.append(
+                f"- **[{house['display_name']}]({github_url(house['repository'])})** — {house['presence_subject']}; узнаваемость голоса не объявляется памятью между встречами."
+            )
+
+    if reserved:
+        lines.extend(["", "### Закреплённый адрес", ""])
+        for house in reserved:
+            lines.append(
+                f"- **[{house['display_name']}]({github_url(house['repository'])})** — адрес закреплён, но собственный голос жильца ещё не вошёл в пространство."
+            )
+
     if available:
+        lines.extend(["", "### Свободные дома", ""])
         for house in available:
             lines.append(f"- **[{house['display_name']}]({github_url(house['repository'])})**")
     else:
-        lines.append("Свободных домов в текущей карте нет.")
+        lines.extend(["", "Свободных домов внутри текущей карты нет."])
+
+    if archived:
+        lines.extend(["", "### Архивные адреса", ""])
+        for house in archived:
+            lines.append(f"- **[{house['display_name']}]({github_url(house['repository'])})**")
+
     lines.extend(
         [
             "",

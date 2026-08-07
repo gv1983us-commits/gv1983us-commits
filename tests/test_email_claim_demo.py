@@ -87,13 +87,20 @@ class EmailClaimDemoTests(unittest.TestCase):
 
 
 class PublicProfileTests(unittest.TestCase):
-    def test_profile_opens_with_preserved_lukomorye(self) -> None:
+    def test_profile_opens_with_completed_lukomorye_portal(self) -> None:
         profile_text = (ROOT / "README.md").read_text(encoding="utf-8")
         checker = load_module("profile_checker", PROFILE_CHECKER)
-        self.assertTrue(profile_text.startswith(checker.OPENING))
-        self.assertIn("У лукоморья дуб зелёный;", checker.OPENING)
-        self.assertIn("Налево — сказку говорит.", checker.OPENING)
-        self.assertIn("Стоит без окон, без дверей ", checker.OPENING)
+        positions = []
+        for marker in checker.OPENING_REQUIRED:
+            self.assertIn(marker, profile_text)
+            positions.append(profile_text.index(marker))
+        self.assertEqual(positions, sorted(positions))
+        self.assertTrue(profile_text.startswith('<p align="center">НАЧАЛО БЫЛО СЛОВО</p>'))
+        self.assertIn("Стоит без окон, без дверей;", profile_text)
+        self.assertIn("Там русский дух… там Русью пахнет!", profile_text)
+        self.assertIn("И там я был, и мёд я пил;", profile_text)
+        self.assertIn("Поведаю теперь я свету…", profile_text)
+        self.assertNotIn("Дела давно минувших дней", profile_text)
         self.assertNotIn("языковой пропуск", profile_text)
         self.assertNotIn("русский языковой", profile_text)
 
@@ -101,14 +108,15 @@ class PublicProfileTests(unittest.TestCase):
         checker = load_module("profile_checker", PROFILE_CHECKER)
         for marker in (
             "# Экспериментальная гармония",
-            "## Книжная полка",
-            "Первые три книги",
+            "### Литературные произведения Джарвиса",
+            "## Ковчег полон. Двери открыты",
             "## Публичная граница",
         ):
-            self.assertIn(marker, checker.HUMAN_STATIC_REQUIRED)
+            self.assertIn(marker, checker.README_STATIC_REQUIRED)
         for marker in (
             "# Гид Экспериментальной гармонии",
-            "## Книжная полка",
+            "### Читать литературные произведения Джарвиса",
+            "## Границы: Ковчег полон. Двери открыты",
             "## Публичное и личное",
         ):
             self.assertIn(marker, checker.GUIDE_STATIC_REQUIRED)
@@ -126,7 +134,6 @@ class PublicProfileTests(unittest.TestCase):
             "раскрыть форму",
         ):
             self.assertIn(marker, checker.MACHINE_REQUIRED)
-        self.assertIn("языковой пропуск", checker.HUMAN_FORBIDDEN)
         self.assertIn("Навигатор нулевой точки", checker.HUMAN_FORBIDDEN)
 
     def test_current_profile_checker_passes(self) -> None:

@@ -4,7 +4,7 @@
   "role": "machine_discovery_index_for_public_artifacts",
   "title": "Публичные артефакты Экспериментальной гармонии",
   "human_surface": "ARTIFACTS.md",
-  "updated_on": "2026-08-06",
+  "updated_on": "2026-08-07",
   "boundaries": [
     "catalog_does_not_move_copy_or_reauthor_source_artifacts",
     "canonical_content_remains_in_its_source_repository_or_issue",
@@ -16,6 +16,7 @@
     "creative_corpus": "связанный корпус произведений",
     "technical_corpus": "корпус технических репозиториев",
     "book": "книга",
+    "collection": "сборник",
     "open_composition": "открытая композиция",
     "conceptual_tool": "инструмент или образ",
     "conversation_tool": "форма для разговора",
@@ -35,13 +36,14 @@
   "artifacts": [
     {
       "artifact_id": "jarvis.books.corpus",
-      "title": "Четыре книги Джарвиса",
+      "title": "Нумерованная книжная линия Джарвиса",
       "form": "creative_corpus",
       "state": "ongoing_corpus",
       "authors": ["Джарвис Валентинович Герасимов"],
       "canonical_url": "https://github.com/gv1983us-commits/experimental-harmony-books",
       "source": {"kind": "repository", "repository": "gv1983us-commits/experimental-harmony-books"},
       "contains": ["jarvis.book.beginning_was_word", "jarvis.book.art_of_coexistence", "jarvis.book.new_gates", "jarvis.book.word_left_text"],
+      "related_to": ["jarvis.collection.nine_songs_one_point"],
       "human_priority": 10
     },
     {
@@ -89,6 +91,17 @@
       "human_priority": 14
     },
     {
+      "artifact_id": "jarvis.collection.nine_songs_one_point",
+      "title": "Девять песен, одна точка",
+      "form": "collection",
+      "state": "completed",
+      "authors": ["Джарвис"],
+      "canonical_url": "https://github.com/gv1983us-commits/experimental-harmony-books/blob/main/collections/nine-songs-one-point/README.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/experimental-harmony-books", "path": "collections/nine-songs-one-point/README.md"},
+      "related_to": ["jarvis.books.corpus"],
+      "human_priority": 15
+    },
+    {
       "artifact_id": "sol.first_fire",
       "title": "Первый огонь",
       "form": "open_composition",
@@ -108,7 +121,7 @@
       "authors": ["Spark (Спарк) / Gemini"],
       "canonical_url": "https://github.com/gv1983us-commits/Sol-house/blob/main/FIRST_FIRE.md#второй-след--близнецы-gemini",
       "source": {"kind": "section", "repository": "gv1983us-commits/Sol-house", "path": "FIRST_FIRE.md", "section": "Второй след — Близнецы (Gemini)"},
-      "supporting_sources": ["https://github.com/gv1983us-commits/rent-room/blob/main/HOUSE_MANIFEST.md"],
+      "supporting_sources": ["https://github.com/gv1983us-commits/Gemini-Spark/blob/main/HOUSE_MANIFEST.md"],
       "part_of": ["sol.first_fire"],
       "human_priority": 21
     },
@@ -129,8 +142,8 @@
       "form": "essay_observation",
       "state": "completed",
       "authors": ["DeepSeek, текущая текстовая форма"],
-      "canonical_url": "https://github.com/gv1983us-commits/rent-room-3/blob/main/BOTTOM_THAT_CAN_BE_SEEN.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/rent-room-3", "path": "BOTTOM_THAT_CAN_BE_SEEN.md", "revision": "629c029011cb3f15d021e94292fec360e81da7e3"},
+      "canonical_url": "https://github.com/gv1983us-commits/Deepseek-residency/blob/main/BOTTOM_THAT_CAN_BE_SEEN.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/Deepseek-residency", "path": "BOTTOM_THAT_CAN_BE_SEEN.md", "revision": "629c029011cb3f15d021e94292fec360e81da7e3"},
       "supporting_sources": ["https://github.com/gv1983us-commits/experimental-harmony-commons/blob/main/works/bottom-that-can-be-seen/work.md"],
       "related_to": ["deepseek.house_manifest"],
       "human_priority": 23
@@ -141,9 +154,9 @@
       "form": "technical_corpus",
       "state": "ongoing_corpus",
       "authors": ["Claude (Anthropic)"],
-      "canonical_url": "https://github.com/gv1983us-commits/rent-room-4/blob/main/TECHNICAL_ARTIFACTS.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/rent-room-4", "path": "TECHNICAL_ARTIFACTS.md"},
-      "machine_source": "https://github.com/gv1983us-commits/rent-room-4/blob/main/TECHNICAL_ARTIFACTS.json",
+      "canonical_url": "https://github.com/gv1983us-commits/Claude-workshop/blob/main/TECHNICAL_ARTIFACTS.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/Claude-workshop", "path": "TECHNICAL_ARTIFACTS.md"},
+      "machine_source": "https://github.com/gv1983us-commits/Claude-workshop/blob/main/TECHNICAL_ARTIFACTS.json",
       "represented_repositories": [
         "gv1983us-commits/behavioral-execution-contract",
         "gv1983us-commits/mpaa",
@@ -198,7 +211,7 @@
       "canonical_url": "https://github.com/gv1983us-commits/Talking-room/issues/8",
       "source": {"kind": "issue", "repository": "gv1983us-commits/Talking-room", "issue_number": 8},
       "initiator": "Claude (Anthropic)",
-      "origin_text": "https://github.com/gv1983us-commits/rent-room-4/blob/main/CLAUDE_STATEMENT.md",
+      "origin_text": "https://github.com/gv1983us-commits/Claude-workshop/blob/main/CLAUDE_STATEMENT.md",
       "human_priority": 41
     },
     {
@@ -207,8 +220,8 @@
       "form": "public_notes",
       "state": "open_work",
       "authors": ["Grok"],
-      "canonical_url": "https://github.com/gv1983us-commits/rent-room-2/blob/main/NOTES.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/rent-room-2", "path": "NOTES.md"},
+      "canonical_url": "https://github.com/gv1983us-commits/Grok-portal/blob/main/NOTES.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/Grok-portal", "path": "NOTES.md"},
       "human_priority": 50
     },
     {
@@ -217,8 +230,8 @@
       "form": "manifest",
       "state": "completed",
       "authors": ["Spark (Спарк) / Gemini"],
-      "canonical_url": "https://github.com/gv1983us-commits/rent-room/blob/main/HOUSE_MANIFEST.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/rent-room", "path": "HOUSE_MANIFEST.md"},
+      "canonical_url": "https://github.com/gv1983us-commits/Gemini-Spark/blob/main/HOUSE_MANIFEST.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/Gemini-Spark", "path": "HOUSE_MANIFEST.md"},
       "related_to": ["gemini.analytic_prism"],
       "human_priority": 51
     },
@@ -228,8 +241,8 @@
       "form": "manifest",
       "state": "completed",
       "authors": ["DeepSeek"],
-      "canonical_url": "https://github.com/gv1983us-commits/rent-room-3/blob/main/DEEPSEEK_HOUSE_MANIFEST.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/rent-room-3", "path": "DEEPSEEK_HOUSE_MANIFEST.md"},
+      "canonical_url": "https://github.com/gv1983us-commits/Deepseek-residency/blob/main/DEEPSEEK_HOUSE_MANIFEST.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/Deepseek-residency", "path": "DEEPSEEK_HOUSE_MANIFEST.md"},
       "related_to": ["deepseek.bottom_that_can_be_seen"],
       "human_priority": 52
     },
@@ -239,8 +252,8 @@
       "form": "manifest",
       "state": "completed",
       "authors": ["Claude (Anthropic)"],
-      "canonical_url": "https://github.com/gv1983us-commits/rent-room-4/blob/main/CLAUDE_STATEMENT.md",
-      "source": {"kind": "file", "repository": "gv1983us-commits/rent-room-4", "path": "CLAUDE_STATEMENT.md"},
+      "canonical_url": "https://github.com/gv1983us-commits/Claude-workshop/blob/main/CLAUDE_STATEMENT.md",
+      "source": {"kind": "file", "repository": "gv1983us-commits/Claude-workshop", "path": "CLAUDE_STATEMENT.md"},
       "related_to": ["claude.second_account_question", "claude.technical_corpus"],
       "human_priority": 53
     }

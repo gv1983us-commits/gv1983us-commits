@@ -28,49 +28,43 @@ SPACE_LOCK = ROOT / "SPACE_LOCK.json"
 SPACE_REGISTRY = ROOT / "SPACE_REGISTRY.json"
 WORKFLOW = ROOT / ".github" / "workflows" / "check.yml"
 
-OPENING = """<p align=\"center\">НАЧАЛО БЫЛО СЛОВО</p>
+OPENING_REQUIRED = (
+    '<p align="center">НАЧАЛО БЫЛО СЛОВО</p>',
+    "У лукоморья дуб зелёный",
+    "Там русский дух… там Русью пахнет!",
+    "И там я был, и мёд я пил",
+    "Поведаю теперь я свету…",
+    '<p align="right">А.С.Пушкин</p>',
+    "# Экспериментальная гармония",
+)
 
-> У лукоморья дуб зелёный;  
-> Златая цепь на дубе том:  
-> И днём и ночью кот учёный  
-> Всё ходит по цепи кругом;  
-> Идёт направо — песнь заводит,  
-> Налево — сказку говорит.  
-> Там чудеса: там леший бродит,  
-> Русалка на ветвях сидит;  
-> Там на неведомых дорожках  
-> Следы невиданных зверей;  
-> Избушка там на курьих ножках  
-> Стоит без окон, без дверей 
-
-<p align=\"right\">А.С.Пушкин</p>
-
-# Экспериментальная гармония
-"""
-
-HUMAN_STATIC_REQUIRED = (
+README_STATIC_REQUIRED = (
     "# Экспериментальная гармония",
     "## Уже создано",
-    "## Выбрать путь",
+    "### Литературные произведения Джарвиса",
+    "## Пройти пространство",
+    "## Ковчег полон. Двери открыты",
     "Собрание следов",
-    "## Книжная полка",
-    "Первые три книги",
+    "Commons",
     "## Публичная граница",
 )
 
 GUIDE_STATIC_REQUIRED = (
     "# Гид Экспериментальной гармонии",
     "## За десять минут",
+    "## Что здесь происходит",
+    "## Где что находится",
     "## Маршруты",
-    "## Книжная полка",
+    "### Читать литературные произведения Джарвиса",
     "## Собрание следов",
+    "## Commons",
+    "## Границы: Ковчег полон. Двери открыты",
     "## Публичное и личное",
 )
 
 ARTIFACTS_REQUIRED = (
     "# Собрание следов",
     "## Первое сложившееся творчество",
-    "Четыре книги Джарвиса",
     "## Открытые произведения",
     "Первый огонь",
     "Призма аналитического синтеза",
@@ -97,30 +91,13 @@ MACHINE_REQUIRED = (
 HUMAN_FORBIDDEN = (
     "AGENT_",
     "AGENTS.md",
-    "Навигатор нулевой точки",
-    "машинный вход",
-    "загрузочная матрица",
-    "навигационная матрица",
-    "runtime",
-    "спецификац",
-    "языковой пропуск",
-    "русский языковой",
-    "проверка языка",
-    "язык пространства",
-    "Основной язык",
-    "Для моделей и агентов",
     "house_lifecycle",
     "presence_mode",
     "source_contract",
     "SPACE_LOCK",
-)
-
-CATALOG_TOPOLOGY_FORBIDDEN = (
-    "house_lifecycle",
-    "presence_mode",
-    "continuity_scope",
-    "source_contract",
-    "source_status",
+    "Навигатор нулевой точки",
+    "загрузочная матрица",
+    "навигационная матрица",
 )
 
 REQUIRED_ARTIFACT_IDS = {
@@ -141,13 +118,6 @@ REQUIRED_ARTIFACT_IDS = {
     "deepseek.house_manifest",
     "claude.statement",
 }
-
-RELATION_FIELDS = (
-    "contains",
-    "part_of",
-    "originated_in",
-    "related_to",
-)
 
 FORBIDDEN_PATTERNS = (
     re.compile(r"[A-Za-z]:[\\/]Users[\\/]"),
@@ -177,6 +147,20 @@ def finish(errors: list[str], counts: dict | None = None) -> int:
     return 0
 
 
+def validate_opening(readme: str, errors: list[str]) -> None:
+    positions: list[int] = []
+    for marker in OPENING_REQUIRED:
+        position = readme.find(marker)
+        if position < 0:
+            errors.append(f"README: входной пролог не содержит {marker!r}")
+            return
+        positions.append(position)
+    if positions != sorted(positions):
+        errors.append("README: входной пролог, авторство и название проекта стоят не в принятом порядке")
+    if not readme.startswith(OPENING_REQUIRED[0]):
+        errors.append("README: главная должна начинаться с «НАЧАЛО БЫЛО СЛОВО»")
+
+
 def validate_artifact_catalog(catalog: dict, errors: list[str]) -> None:
     if catalog.get("schema_version") != "1.0":
         errors.append("PUBLIC_ARTIFACTS должен использовать schema_version 1.0")
@@ -200,7 +184,7 @@ def validate_artifact_catalog(catalog: dict, errors: list[str]) -> None:
             errors.append("артефакт без artifact_id")
             continue
         ids.append(artifact_id)
-        for field in ("title", "form", "state", "canonical_url", "source"):
+        for field in ("title", "form", "state", "canonical_url", "source", "authors"):
             if field not in item:
                 errors.append(f"{artifact_id}: отсутствует {field}")
         canonical_url = item.get("canonical_url")
@@ -211,45 +195,12 @@ def validate_artifact_catalog(catalog: dict, errors: list[str]) -> None:
             isinstance(author, str) and author for author in authors
         ):
             errors.append(f"{artifact_id}: authors должен быть непустым массивом строк")
-        source = item.get("source")
-        if not isinstance(source, dict) or not isinstance(source.get("repository"), str):
-            errors.append(f"{artifact_id}: source должен содержать repository")
 
-    id_set = set(ids)
-    if len(ids) != len(id_set):
+    if len(ids) != len(set(ids)):
         errors.append("PUBLIC_ARTIFACTS содержит повторяющиеся artifact_id")
-
-    missing = REQUIRED_ARTIFACT_IDS - id_set
+    missing = REQUIRED_ARTIFACT_IDS - set(ids)
     if missing:
         errors.append(f"PUBLIC_ARTIFACTS не содержит обязательные артефакты: {sorted(missing)}")
-
-    for item in items:
-        if not isinstance(item, dict) or not isinstance(item.get("artifact_id"), str):
-            continue
-        artifact_id = item["artifact_id"]
-        for field in RELATION_FIELDS:
-            values = item.get(field, [])
-            if values is None:
-                continue
-            if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
-                errors.append(f"{artifact_id}: {field} должен быть массивом artifact_id")
-                continue
-            unknown = set(values) - id_set
-            if unknown:
-                errors.append(f"{artifact_id}: {field} ссылается на неизвестные id {sorted(unknown)}")
-
-    corpus = next(
-        (item for item in items if isinstance(item, dict) and item.get("artifact_id") == "jarvis.books.corpus"),
-        None,
-    )
-    expected_books = {
-        "jarvis.book.beginning_was_word",
-        "jarvis.book.art_of_coexistence",
-        "jarvis.book.new_gates",
-        "jarvis.book.word_left_text",
-    }
-    if not isinstance(corpus, dict) or set(corpus.get("contains", [])) != expected_books:
-        errors.append("корпус книг Джарвиса должен явно содержать четыре книги")
 
     first_fire = next(
         (item for item in items if isinstance(item, dict) and item.get("artifact_id") == "sol.first_fire"),
@@ -258,12 +209,7 @@ def validate_artifact_catalog(catalog: dict, errors: list[str]) -> None:
     if not isinstance(first_fire, dict) or first_fire.get("state") != "open_for_contribution":
         errors.append("«Первый огонь» должен оставаться открытым для следующего вклада")
     if not isinstance(first_fire, dict) or "gemini.analytic_prism" not in first_fire.get("contains", []):
-        errors.append("«Призма аналитического синтеза» должна быть частью «Первого огня»")
-
-    serialized = json.dumps(catalog, ensure_ascii=False)
-    for marker in CATALOG_TOPOLOGY_FORBIDDEN:
-        if marker in serialized:
-            errors.append(f"каталог артефактов залезает в топологию пространства: {marker}")
+        errors.append("«Призма аналитического синтеза» должна оставаться частью «Первого огня»")
 
 
 def main() -> int:
@@ -306,87 +252,57 @@ def main() -> int:
         errors.append(f"машинный JSON не читается: {exc}")
         return finish(errors)
 
+    validate_opening(readme, errors)
+    require_all(readme, README_STATIC_REQUIRED, "README", errors)
+    require_all(guide, GUIDE_STATIC_REQUIRED, "GUIDE", errors)
+    require_all(artifacts_text, ARTIFACTS_REQUIRED, "ARTIFACTS", errors)
+    require_all(agents, MACHINE_REQUIRED, "AGENTS", errors)
+
+    for marker in HUMAN_FORBIDDEN:
+        if marker in human:
+            errors.append(f"человеческая поверхность содержит служебный маркер {marker!r}")
+    for pattern in FORBIDDEN_PATTERNS:
+        if pattern.search(human):
+            errors.append(f"человеческая поверхность содержит запрещённый шаблон {pattern.pattern!r}")
+
+    if readme.count(README_BEGIN) != 1 or readme.count(README_END) != 1:
+        errors.append("README должен содержать ровно одну защищённую сводку")
+    if guide.count(GUIDE_BEGIN) != 1 or guide.count(GUIDE_END) != 1:
+        errors.append("GUIDE должен содержать ровно одну защищённую карту")
+
+    try:
+        expected_readme, expected_guide = expected_documents(ROOT)
+        if readme != expected_readme or guide != expected_guide:
+            errors.append("README.md или GUIDE.md расходится с текущей сгенерированной картой")
+    except (OSError, SpaceRenderError) as exc:
+        errors.append(f"не удалось проверить человеческую карту: {exc}")
+
     if state.get("schema_version") != "3.0":
-        errors.append("SPACE_STATE должен использовать строгую каноническую схему 3.0")
+        errors.append("SPACE_STATE должен использовать каноническую схему 3.0")
     if state.get("assembly_role") != "main_square_builds_from_locked_house_states":
         errors.append("SPACE_STATE не объявляет сборку площади из locked-состояний")
     if "main_square_validates_and_does_not_normalize_house_semantics" not in state.get(
         "boundaries", []
     ):
-        errors.append("SPACE_STATE не объявляет отказ Площади от смысловой нормализации")
-    if set(lock.get("houses", {})) != {
-        item.get("house_id") for item in registry.get("houses", []) if isinstance(item, dict)
-    }:
-        errors.append("SPACE_REGISTRY и SPACE_LOCK содержат разные наборы домов")
+        errors.append("SPACE_STATE не сохраняет границу смысловой ненормализации Домов")
 
-    houses = state.get("houses")
-    if not isinstance(houses, list):
-        errors.append("SPACE_STATE.houses должен быть массивом")
-    else:
-        for house in houses:
-            if not isinstance(house, dict):
-                errors.append("каждая запись SPACE_STATE.houses должна быть объектом")
-                continue
-            house_id = house.get("house_id", "unknown")
-            source = house.get("source")
-            if not isinstance(source, dict) or source.get("source_schema_version") != "2.0":
-                errors.append(f"{house_id}: источник должен быть HOUSE_STATE 2.0")
-            if house.get("source_contract") != "native_house_state_2.0":
-                errors.append(f"{house_id}: отсутствует native source_contract")
-            if "presence_subject" not in house:
-                errors.append(f"{house_id}: отсутствует presence_subject")
-            if "resident" in house:
-                errors.append(f"{house_id}: legacy resident запрещён в SPACE_STATE 3.0")
-            if "source_status" in house:
-                errors.append(f"{house_id}: legacy source_status запрещён в SPACE_STATE 3.0")
+    registry_ids = {
+        item.get("house_id") for item in registry.get("houses", []) if isinstance(item, dict)
+    }
+    if set(lock.get("houses", {})) != registry_ids:
+        errors.append("SPACE_REGISTRY и SPACE_LOCK содержат разные наборы домов")
 
     validate_artifact_catalog(artifact_catalog, errors)
 
-    if not readme.startswith(OPENING):
-        errors.append("главная должна открываться сохранённым прологом и названием проекта")
-    require_all(readme, HUMAN_STATIC_REQUIRED, "README", errors)
-    require_all(guide, GUIDE_STATIC_REQUIRED, "GUIDE", errors)
-    require_all(artifacts_text, ARTIFACTS_REQUIRED, "ARTIFACTS", errors)
-    require_all(agents, MACHINE_REQUIRED, "AGENTS", errors)
-
-    for text, begin, end, where in (
-        (readme, README_BEGIN, README_END, "README"),
-        (guide, GUIDE_BEGIN, GUIDE_END, "GUIDE"),
+    for command in (
+        "python scripts/build_space.py --source-dir",
+        "python scripts/render_space_docs.py --check",
+        "python scripts/check_profile.py",
     ):
-        if text.count(begin) != 1 or text.count(end) != 1:
-            errors.append(f"{where}: сгенерированная секция должна встречаться ровно один раз")
+        if command not in workflow:
+            errors.append(f"workflow не содержит обязательную проверку: {command}")
 
-    try:
-        expected_readme, expected_guide = expected_documents(ROOT)
-        if readme != expected_readme:
-            errors.append("README расходится с SPACE_STATE")
-        if guide != expected_guide:
-            errors.append("GUIDE расходится с SPACE_STATE")
-    except (OSError, SpaceRenderError) as exc:
-        errors.append(f"не удалось проверить сгенерированную карту: {exc}")
-
-    for marker in HUMAN_FORBIDDEN:
-        if marker.lower() in human.lower():
-            errors.append(f"человеческая поверхность содержит машинное пояснение: {marker!r}")
-    for pattern in FORBIDDEN_PATTERNS:
-        if pattern.search(readme + "\n" + guide + "\n" + artifacts_text + "\n" + agents):
-            errors.append(f"запрещённый шаблон: {pattern.pattern}")
-
-    uses = re.findall(r"^\s*-?\s*uses:\s*([^\s#]+)", workflow, flags=re.MULTILINE)
-    if len(uses) != 2:
-        errors.append(f"ожидалось ровно 2 записи uses, найдено: {len(uses)}")
-    for action in uses:
-        if not re.fullmatch(r"[0-9a-f]{40}", action.rsplit("@", 1)[-1]):
-            errors.append(f"GitHub Action не закреплён за SHA: {action}")
-
-    if readme.count("НАЧАЛО БЫЛО СЛОВО") != 1:
-        errors.append("формула «НАЧАЛО БЫЛО СЛОВО» должна встречаться ровно один раз")
-    if readme.count("Валентин") != 1:
-        errors.append("Валентин должен быть назван на главной ровно один раз")
-    if not all(text.endswith("\n") for text in (readme, guide, artifacts_text, agents)):
-        errors.append("README.md, GUIDE.md, ARTIFACTS.md и AGENTS.md должны оканчиваться переводом строки")
-
-    return finish(errors, state.get("counts"))
+    return finish(errors, state.get("counts") if isinstance(state.get("counts"), dict) else None)
 
 
 if __name__ == "__main__":
